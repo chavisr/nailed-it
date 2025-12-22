@@ -1042,10 +1042,188 @@ export default function App() {
   };
 
   const exportImage = () => {
-    const canvas = canvasRef.current;
+    // Create a temporary canvas for clean export
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvasSettings.width;
+    tempCanvas.height = canvasSettings.height;
+    const ctx = tempCanvas.getContext('2d');
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Draw background
+    ctx.save();
+    ctx.globalAlpha = canvasSettings.bgOpacity;
+    
+    if (canvasSettings.bgBlur > 0) {
+      ctx.filter = `blur(${canvasSettings.bgBlur}px)`;
+    }
+    
+    if (canvasSettings.bgImage) {
+      ctx.drawImage(canvasSettings.bgImage, 0, 0, tempCanvas.width, tempCanvas.height);
+    } else if (canvasSettings.bgType === 'gradient') {
+      const angle = (canvasSettings.bgGradientAngle || 0) * Math.PI / 180;
+      const x1 = tempCanvas.width / 2 - Math.cos(angle) * tempCanvas.width / 2;
+      const y1 = tempCanvas.height / 2 - Math.sin(angle) * tempCanvas.height / 2;
+      const x2 = tempCanvas.width / 2 + Math.cos(angle) * tempCanvas.width / 2;
+      const y2 = tempCanvas.height / 2 + Math.sin(angle) * tempCanvas.height / 2;
+      
+      const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+      gradient.addColorStop(0, canvasSettings.bgGradientStart || canvasSettings.bgColor);
+      gradient.addColorStop(1, canvasSettings.bgGradientEnd || '#ffffff');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    } else {
+      ctx.fillStyle = canvasSettings.bgColor;
+      ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    }
+    
+    ctx.restore();
+
+    // Draw all visible layers (without selection box, guides, grid, etc.)
+    layers.filter(l => l.visible).forEach(layer => {
+      ctx.save();
+      ctx.globalAlpha = layer.opacity;
+
+      if (layer.type === 'image' && layer.image) {
+        // Apply image adjustments and filters
+        const filters = [];
+        
+        if (layer.brightness !== 100) {
+          filters.push(`brightness(${layer.brightness}%)`);
+        }
+        if (layer.contrast !== 100) {
+          filters.push(`contrast(${layer.contrast}%)`);
+        }
+        if (layer.saturation !== 100) {
+          filters.push(`saturate(${layer.saturation}%)`);
+        }
+        if (layer.hue !== 0) {
+          filters.push(`hue-rotate(${layer.hue}deg)`);
+        }
+        
+        switch (layer.filter) {
+          case 'grayscale':
+            filters.push('grayscale(100%)');
+            break;
+          case 'sepia':
+            filters.push('sepia(100%)');
+            break;
+          case 'invert':
+            filters.push('invert(100%)');
+            break;
+          case 'vintage':
+            filters.push('sepia(40%) contrast(110%) brightness(90%)');
+            break;
+          case 'cool':
+            filters.push('hue-rotate(180deg) saturate(120%)');
+            break;
+          case 'warm':
+            filters.push('sepia(20%) saturate(130%) brightness(105%)');
+            break;
+        }
+        
+        if (layer.blur > 0) {
+          filters.push(`blur(${layer.blur}px)`);
+        }
+        
+        if (filters.length > 0) {
+          ctx.filter = filters.join(' ');
+        }
+        
+        if (layer.shadow.blur > 0) {
+          ctx.shadowColor = layer.shadow.color;
+          ctx.shadowBlur = layer.shadow.blur;
+          ctx.shadowOffsetX = layer.shadow.offsetX;
+          ctx.shadowOffsetY = layer.shadow.offsetY;
+        }
+
+        ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
+        ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+        ctx.scale(layer.flipH ? -1 : 1, layer.flipV ? -1 : 1);
+        
+        ctx.drawImage(
+          layer.image,
+          -layer.width / 2, -layer.height / 2, layer.width, layer.height
+        );
+        
+        if (layer.border.width > 0) {
+          ctx.strokeStyle = layer.border.color;
+          ctx.lineWidth = layer.border.width;
+          ctx.strokeRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
+        }
+        
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+      } else if (layer.type === 'text') {
+        let fontStyle = '';
+        if (layer.bold) fontStyle += 'bold ';
+        if (layer.italic) fontStyle += 'italic ';
+        ctx.font = `${fontStyle}${layer.fontSize}px ${layer.fontFamily}`;
+        
+        if (layer.blur > 0) {
+          ctx.filter = `blur(${layer.blur}px)`;
+        }
+
+        if (layer.shadow.blur > 0) {
+          ctx.shadowColor = layer.shadow.color;
+          ctx.shadowBlur = layer.shadow.blur;
+          ctx.shadowOffsetX = layer.shadow.offsetX;
+          ctx.shadowOffsetY = layer.shadow.offsetY;
+        }
+
+        if (layer.textEffect === 'gradient') {
+          const angle = (layer.gradientAngle || 0) * Math.PI / 180;
+          const gradientLength = layer.fontSize * 2;
+          const x1 = layer.x - Math.cos(angle) * gradientLength / 2;
+          const y1 = layer.y - Math.sin(angle) * gradientLength / 2;
+          const x2 = layer.x + Math.cos(angle) * gradientLength / 2;
+          const y2 = layer.y + Math.sin(angle) * gradientLength / 2;
+          
+          const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+          gradient.addColorStop(0, layer.gradientStart || layer.color);
+          gradient.addColorStop(1, layer.gradientEnd || '#ff0000');
+          ctx.fillStyle = gradient;
+        } else {
+          ctx.fillStyle = layer.color;
+        }
+        
+        const lines = layer.text.split('\n');
+        const lineHeightMultiplier = layer.lineHeight || 1.2;
+        const lineHeight = layer.fontSize * lineHeightMultiplier;
+        
+        if (layer.rotation) {
+          ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
+          ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+          ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
+        }
+        
+        lines.forEach((line, index) => {
+          const yPos = layer.y + layer.fontSize + (index * lineHeight);
+          const xPos = layer.x;
+          
+          if (layer.strokeWidth > 0) {
+            ctx.strokeStyle = layer.strokeColor || '#000000';
+            ctx.lineWidth = layer.strokeWidth;
+            ctx.lineJoin = 'round';
+            ctx.miterLimit = 2;
+            ctx.strokeText(line, xPos, yPos);
+          }
+          
+          ctx.fillText(line, xPos, yPos);
+        });
+        
+        if (layer.rotation) {
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+      }
+
+      ctx.restore();
+    });
+    
+    // Export the clean canvas
     const link = document.createElement('a');
     link.download = 'thumbnail.png';
-    link.href = canvas.toDataURL();
+    link.href = tempCanvas.toDataURL();
     link.click();
   };
 
