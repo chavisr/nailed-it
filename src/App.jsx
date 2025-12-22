@@ -1577,6 +1577,99 @@ export default function App() {
     }
   };
 
+  const exportProject = () => {
+    try {
+      // Convert layers to serializable format
+      const serializableLayers = layers.map(layer => {
+        if (layer.type === 'image' && layer.image) {
+          const canvas = document.createElement('canvas');
+          canvas.width = layer.image.width;
+          canvas.height = layer.image.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(layer.image, 0, 0);
+          const imageData = canvas.toDataURL();
+          return { ...layer, image: null, imageData };
+        }
+        return layer;
+      });
+      
+      // Save canvas settings
+      const serializableCanvas = { ...canvasSettings };
+      if (canvasSettings.bgImage) {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvasSettings.bgImage.width;
+        canvas.height = canvasSettings.bgImage.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(canvasSettings.bgImage, 0, 0);
+        serializableCanvas.bgImageData = canvas.toDataURL();
+        serializableCanvas.bgImage = null;
+      }
+      
+      const project = {
+        version: '1.0',
+        layers: serializableLayers,
+        canvas: serializableCanvas,
+        timestamp: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `thumbnail-project-${Date.now()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export project:', error);
+      alert('Failed to export project. Please try again.');
+    }
+  };
+
+  const importProject = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const project = JSON.parse(event.target.result);
+        
+        // Restore layers
+        const restoredLayers = project.layers.map(layer => {
+          if (layer.type === 'image' && layer.imageData) {
+            const img = new Image();
+            img.src = layer.imageData;
+            return { ...layer, image: img };
+          }
+          return layer;
+        });
+        
+        setLayers(restoredLayers);
+        setSelectedLayer(null);
+        
+        // Restore canvas settings
+        if (project.canvas.bgImageData) {
+          const img = new Image();
+          img.src = project.canvas.bgImageData;
+          img.onload = () => {
+            setCanvasSettings({ ...project.canvas, bgImage: img });
+          };
+        } else {
+          setCanvasSettings(project.canvas);
+        }
+        
+        alert('Project imported successfully!');
+      } catch (error) {
+        console.error('Failed to import project:', error);
+        alert('Failed to import project. Please make sure the file is valid.');
+      }
+    };
+    reader.readAsText(file);
+    
+    // Reset file input
+    e.target.value = '';
+  };
+
   const selectedLayerData = layers.find(l => l.id === selectedLayer);
 
   return (
@@ -1662,6 +1755,30 @@ export default function App() {
             >
               <Settings size={18} />
             </button>
+          </div>
+
+          <div className="h-6 w-px bg-gray-600"></div>
+
+          <div className={`flex items-center gap-2 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
+            <button
+              onClick={exportProject}
+              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded text-sm"
+              title="Save Project"
+            >
+              <Download size={16} />
+              <span className="text-xs">Save</span>
+            </button>
+            <label className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded cursor-pointer text-sm"
+              title="Load Project">
+              <ImagePlus size={16} />
+              <span className="text-xs">Load</span>
+              <input type="file" accept=".json" onChange={importProject} className="hidden" />
+            </label>
+          </div>
+
+          <div className="h-6 w-px bg-gray-600"></div>
+
+          <div className={`flex items-center gap-2 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
             <button
               onClick={pasteFromClipboard}
               className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded text-sm"
