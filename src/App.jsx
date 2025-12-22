@@ -2713,28 +2713,6 @@ export default function App() {
             
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-sm">Background Opacity: {canvasSettings.bgOpacity.toFixed(2)}</label>
-                <button
-                  onClick={() => setCanvasSettings({...canvasSettings, bgOpacity: 1})}
-                  className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
-                  title="Reset Background Opacity"
-                >
-                  <RotateCcw size={14} />
-                </button>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={canvasSettings.bgOpacity}
-                onChange={(e) => setCanvasSettings({...canvasSettings, bgOpacity: +e.target.value})}
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <div className="flex items-center justify-between mb-1">
                 <label className="text-sm">Background Blur: {canvasSettings.bgBlur}px</label>
                 <button
                   onClick={() => setCanvasSettings({...canvasSettings, bgBlur: 0})}
