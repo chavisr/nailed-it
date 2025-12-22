@@ -49,6 +49,7 @@ export default function App() {
   const [canvasSettings, setCanvasSettings] = useState(DEFAULT_CANVAS);
   const [layers, setLayers] = useState([]);
   const [selectedLayer, setSelectedLayer] = useState(null);
+  const [selectedLayers, setSelectedLayers] = useState([]); // For multi-selection
   const [draggedLayer, setDraggedLayer] = useState(null);
   const [zoom, setZoom] = useState(1);
   const canvasRef = useRef(null);
@@ -107,7 +108,7 @@ export default function App() {
 
   useEffect(() => {
     renderCanvas();
-  }, [layers, canvasSettings, selectedLayer, guides, cropMode, cropBox]);
+  }, [layers, canvasSettings, selectedLayer, selectedLayers, guides, cropMode, cropBox]);
 
   // Save to localStorage whenever layers or canvas settings change
   useEffect(() => {
@@ -154,11 +155,19 @@ export default function App() {
                        e.target.tagName === 'TEXTAREA' || 
                        e.target.isContentEditable;
       
-      if (e.key === 'Delete' && selectedLayer && !cropMode && !isTyping) {
-        deleteLayer(selectedLayer);
+      if (e.key === 'Delete' && !cropMode && !isTyping) {
+        if (selectedLayers.length > 0) {
+          // Delete all selected layers
+          const newLayers = layers.filter(l => !selectedLayers.includes(l.id));
+          setLayers(newLayers);
+          setSelectedLayers([]);
+          setSelectedLayer(null);
+        } else if (selectedLayer) {
+          deleteLayer(selectedLayer);
+        }
       }
       
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedLayer && !cropMode && !isTyping) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedLayer && !cropMode && !isTyping && selectedLayers.length === 0) {
         e.preventDefault();
         const layerToCopy = layers.find(l => l.id === selectedLayer);
         if (layerToCopy) {
@@ -166,7 +175,7 @@ export default function App() {
         }
       }
       
-      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && copiedLayer && !cropMode && !isTyping) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && copiedLayer && !cropMode && !isTyping && selectedLayers.length === 0) {
         e.preventDefault();
         const newLayer = {
           ...copiedLayer,
@@ -179,26 +188,47 @@ export default function App() {
       }
       
       // Only move layers with arrow keys if NOT typing in a text field
-      if (selectedLayer && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !cropMode && !isTyping) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !cropMode && !isTyping) {
         e.preventDefault();
-        const layer = layers.find(l => l.id === selectedLayer);
-        if (layer) {
-          const step = e.shiftKey ? 10 : 5;
-          let updates = {};
-          
-          if (e.key === 'ArrowUp') updates.y = layer.y - step;
-          if (e.key === 'ArrowDown') updates.y = layer.y + step;
-          if (e.key === 'ArrowLeft') updates.x = layer.x - step;
-          if (e.key === 'ArrowRight') updates.x = layer.x + step;
-          
-          updateLayer(selectedLayer, updates);
+        const step = e.shiftKey ? 10 : 5;
+        
+        if (selectedLayers.length > 0) {
+          // Move all selected layers
+          const newLayers = layers.map(l => {
+            if (selectedLayers.includes(l.id)) {
+              let updates = {};
+              if (e.key === 'ArrowUp') updates.y = l.y - step;
+              if (e.key === 'ArrowDown') updates.y = l.y + step;
+              if (e.key === 'ArrowLeft') updates.x = l.x - step;
+              if (e.key === 'ArrowRight') updates.x = l.x + step;
+              return { ...l, ...updates };
+            }
+            return l;
+          });
+          setLayers(newLayers);
+        } else if (selectedLayer) {
+          const layer = layers.find(l => l.id === selectedLayer);
+          if (layer) {
+            let updates = {};
+            if (e.key === 'ArrowUp') updates.y = layer.y - step;
+            if (e.key === 'ArrowDown') updates.y = layer.y + step;
+            if (e.key === 'ArrowLeft') updates.x = layer.x - step;
+            if (e.key === 'ArrowRight') updates.x = layer.x + step;
+            updateLayer(selectedLayer, updates);
+          }
         }
+      }
+      
+      // Escape key to deselect all
+      if (e.key === 'Escape' && !isTyping) {
+        setSelectedLayers([]);
+        setSelectedLayer(null);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedLayer, copiedLayer, layers, cropMode]);
+  }, [selectedLayer, selectedLayers, copiedLayer, layers, cropMode]);
 
   const applyImageAdjustments = (ctx, layer) => {
     if (layer.type !== 'image') return;
@@ -516,7 +546,7 @@ export default function App() {
     });
 
     const layer = layers.find(l => l.id === selectedLayer);
-    if (layer) {
+    if (layer && selectedLayers.length === 0) {
       ctx.strokeStyle = '#3b82f6';
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
@@ -535,6 +565,20 @@ export default function App() {
       handles.forEach(h => {
         ctx.fillRect(h.x, h.y, handleSize, handleSize);
       });
+    }
+    
+    // Draw selection boxes for multi-selected layers (green boxes, no handles)
+    if (selectedLayers.length > 0) {
+      selectedLayers.forEach(layerId => {
+        const layer = layers.find(l => l.id === layerId);
+        if (layer) {
+          ctx.strokeStyle = '#10b981';
+          ctx.lineWidth = 3;
+          ctx.setLineDash([5, 5]);
+          ctx.strokeRect(layer.x - 2, layer.y - 2, layer.width + 4, layer.height + 4);
+        }
+      });
+      ctx.setLineDash([]);
     }
 
     // Draw crop box if in crop mode
@@ -856,8 +900,42 @@ export default function App() {
     const clickedLayer = [...layers].reverse().find(l => 
       l.visible && x >= l.x && x <= l.x + l.width && y >= l.y && y <= l.y + l.height
     );
+    
+    const isCtrlPressed = e.ctrlKey || e.metaKey;
 
     if (clickedLayer) {
+      // Multi-selection with Ctrl/Cmd
+      if (isCtrlPressed) {
+        if (selectedLayers.includes(clickedLayer.id)) {
+          // Deselect if already selected in multi-selection
+          setSelectedLayers(selectedLayers.filter(id => id !== clickedLayer.id));
+        } else {
+          // Add to selection
+          // If there's a currently selected single layer, include it
+          const newSelection = [...selectedLayers];
+          if (selectedLayer && !newSelection.includes(selectedLayer)) {
+            newSelection.push(selectedLayer);
+          }
+          newSelection.push(clickedLayer.id);
+          setSelectedLayers(newSelection);
+        }
+        setSelectedLayer(null);
+        return;
+      }
+      
+      // Check if clicking on already selected layer in multi-selection
+      if (selectedLayers.length > 0 && selectedLayers.includes(clickedLayer.id)) {
+        // Start dragging the group - store absolute mouse position
+        setIsDragging(true);
+        setDragStart({ x: x, y: y });
+        return;
+      }
+      
+      // Clear multi-selection if clicking on non-selected layer
+      if (selectedLayers.length > 0) {
+        setSelectedLayers([]);
+      }
+      
       setSelectedLayer(clickedLayer.id);
       
       const handleSize = 16;
@@ -890,6 +968,7 @@ export default function App() {
       }
     } else if (!cropMode) {
       setSelectedLayer(null);
+      setSelectedLayers([]);
     }
   };
 
@@ -1027,9 +1106,25 @@ export default function App() {
       return;
     }
 
-    if (isDragging && selectedLayer) {
-      let newX = x - dragStart.x;
-      let newY = y - dragStart.y;
+    if (isDragging && (selectedLayer || selectedLayers.length > 0)) {
+      if (selectedLayers.length > 0) {
+        // Move all selected layers together, maintaining relative positions
+        const dx = x - dragStart.x;
+        const dy = y - dragStart.y;
+        
+        const newLayers = layers.map(layer => {
+          if (selectedLayers.includes(layer.id)) {
+            return { ...layer, x: layer.x + dx, y: layer.y + dy };
+          }
+          return layer;
+        });
+        setLayers(newLayers);
+        // Update dragStart to current position for next movement
+        setDragStart({ x: x, y: y });
+      } else {
+        // Single layer movement
+        let newX = x - dragStart.x;
+        let newY = y - dragStart.y;
       
       const snapThreshold = 5;
       const currentLayer = layers.find(l => l.id === selectedLayer);
@@ -1114,6 +1209,7 @@ export default function App() {
       
       updateLayer(selectedLayer, { x: newX, y: newY });
       setGuides({ x: xGuides, y: yGuides });
+      }
     } else if (resizing) {
       const layer = layers.find(l => l.id === resizing.layerId);
       if (!layer) return;
@@ -1718,9 +1814,29 @@ export default function App() {
                     }
                   }}
                   className={`p-2 bg-gray-700 rounded flex items-center gap-2 cursor-move ${
-                    selectedLayer === layer.id ? 'ring-2 ring-blue-500' : ''
+                    selectedLayer === layer.id || selectedLayers.includes(layer.id) ? 'ring-2 ring-blue-500' : ''
                   }`}
-                  onClick={() => setSelectedLayer(layer.id)}
+                  onClick={(e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                      // Multi-select from layer list
+                      if (selectedLayers.includes(layer.id)) {
+                        setSelectedLayers(selectedLayers.filter(id => id !== layer.id));
+                      } else {
+                        // Add to selection
+                        // If there's a currently selected single layer, include it
+                        const newSelection = [...selectedLayers];
+                        if (selectedLayer && !newSelection.includes(selectedLayer)) {
+                          newSelection.push(selectedLayer);
+                        }
+                        newSelection.push(layer.id);
+                        setSelectedLayers(newSelection);
+                      }
+                      setSelectedLayer(null);
+                    } else {
+                      setSelectedLayer(layer.id);
+                      setSelectedLayers([]);
+                    }
+                  }}
                 >
                   <button onClick={(e) => { e.stopPropagation(); toggleVisibility(layer.id); }}>
                     {layer.visible ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -1883,7 +1999,7 @@ export default function App() {
         </div>
       </div>
 
-      {selectedLayerData ? (
+      {selectedLayerData && selectedLayers.length === 0 ? (
         <div className="w-80 bg-gray-800 overflow-y-auto relative">
           <div className={`p-4 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
             <h2 className="text-xl font-bold mb-4">Properties</h2>
@@ -2441,6 +2557,18 @@ export default function App() {
               </div>
             </>
           )}
+          </div>
+        </div>
+      ) : selectedLayers.length > 0 ? (
+        <div className="w-80 bg-gray-800 p-4 overflow-y-auto">
+          <h2 className="text-xl font-bold mb-4">Multi-Selection</h2>
+          <div className="text-center py-8 px-4">
+            <div className="space-y-2 text-sm text-gray-300">
+              <p>✓ Drag on canvas to move</p>
+              <p>✓ Arrow keys to move</p>
+              <p>✓ Delete key to remove all</p>
+              <p>✓ Escape to deselect</p>
+            </div>
           </div>
         </div>
       ) : (
