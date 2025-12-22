@@ -4,7 +4,7 @@ import { Eye, EyeOff, Trash2, ImagePlus, Type, Download, ZoomIn, ZoomOut, FlipHo
 // Load Google Fonts
 const loadGoogleFonts = () => {
   const link = document.createElement('link');
-  link.href = 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Bebas+Neue&family=Pacifico&family=Bangers&family=Permanent+Marker&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@400;700&family=Montserrat:wght@400;700&family=League+Spartan:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Luckiest+Guy&family=Permanent+Marker&display=swap';
   link.rel = 'stylesheet';
   if (!document.querySelector(`link[href="${link.href}"]`)) {
     document.head.appendChild(link);
@@ -68,11 +68,85 @@ export default function App() {
   // Load Google Fonts on mount
   useEffect(() => {
     loadGoogleFonts();
+    
+    // Load saved state from localStorage
+    try {
+      const savedLayers = localStorage.getItem('thumbnailEditorLayers');
+      const savedCanvas = localStorage.getItem('thumbnailEditorCanvas');
+      
+      if (savedLayers) {
+        const parsedLayers = JSON.parse(savedLayers);
+        // Restore image objects
+        const restoredLayers = parsedLayers.map(layer => {
+          if (layer.type === 'image' && layer.imageData) {
+            const img = new Image();
+            img.src = layer.imageData;
+            return { ...layer, image: img };
+          }
+          return layer;
+        });
+        setLayers(restoredLayers);
+      }
+      
+      if (savedCanvas) {
+        const parsedCanvas = JSON.parse(savedCanvas);
+        // Restore background image if exists
+        if (parsedCanvas.bgImageData) {
+          const img = new Image();
+          img.src = parsedCanvas.bgImageData;
+          img.onload = () => {
+            setCanvasSettings({ ...parsedCanvas, bgImage: img });
+          };
+        } else {
+          setCanvasSettings(parsedCanvas);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load saved state:', error);
+    }
   }, []);
 
   useEffect(() => {
     renderCanvas();
   }, [layers, canvasSettings, selectedLayer, guides, cropMode, cropBox]);
+
+  // Save to localStorage whenever layers or canvas settings change
+  useEffect(() => {
+    try {
+      // Convert layers to serializable format
+      const serializableLayers = layers.map(layer => {
+        if (layer.type === 'image' && layer.image) {
+          // Convert image to data URL for storage
+          const canvas = document.createElement('canvas');
+          canvas.width = layer.image.width;
+          canvas.height = layer.image.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(layer.image, 0, 0);
+          const imageData = canvas.toDataURL();
+          return { ...layer, image: null, imageData };
+        }
+        return layer;
+      });
+      
+      localStorage.setItem('thumbnailEditorLayers', JSON.stringify(serializableLayers));
+      
+      // Save canvas settings
+      const serializableCanvas = { ...canvasSettings };
+      if (canvasSettings.bgImage) {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvasSettings.bgImage.width;
+        canvas.height = canvasSettings.bgImage.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(canvasSettings.bgImage, 0, 0);
+        serializableCanvas.bgImageData = canvas.toDataURL();
+        serializableCanvas.bgImage = null;
+      }
+      
+      localStorage.setItem('thumbnailEditorCanvas', JSON.stringify(serializableCanvas));
+    } catch (error) {
+      console.error('Failed to save state:', error);
+    }
+  }, [layers, canvasSettings]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -593,7 +667,7 @@ export default function App() {
       width: 200,
       height: 50,
       fontSize: 48,
-      fontFamily: 'Arial',
+      fontFamily: "Impact, 'Arial Black', sans-serif",
       color: '#ffffff',
       bold: false,
       italic: false,
@@ -716,7 +790,7 @@ export default function App() {
             width: 200,
             height: 50,
             fontSize: 48,
-            fontFamily: 'Arial',
+            fontFamily: "Impact, 'Arial Black', sans-serif",
             color: '#ffffff',
             bold: false,
             italic: false,
@@ -1493,6 +1567,16 @@ export default function App() {
     setCanvasSettings({ ...canvasSettings, bgImage: null });
   };
 
+  const clearAll = () => {
+    if (confirm('Are you sure you want to clear everything? This cannot be undone.')) {
+      setLayers([]);
+      setSelectedLayer(null);
+      setCanvasSettings(DEFAULT_CANVAS);
+      localStorage.removeItem('thumbnailEditorLayers');
+      localStorage.removeItem('thumbnailEditorCanvas');
+    }
+  };
+
   const selectedLayerData = layers.find(l => l.id === selectedLayer);
 
   return (
@@ -1910,29 +1994,32 @@ export default function App() {
               </div>
 
               <div className="mb-3 grid grid-cols-3 gap-2">
-                <label className="flex items-center gap-2">
+                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gray-700 hover:bg-gray-600 px-2 py-2 rounded">
                   <input
                     type="checkbox"
                     checked={selectedLayerData.bold}
                     onChange={(e) => updateLayer(selectedLayer, { bold: e.target.checked })}
+                    className="hidden"
                   />
-                  <span className="text-sm">Bold</span>
+                  <span className={`text-lg font-bold ${selectedLayerData.bold ? 'text-blue-400' : 'text-gray-400'}`}>B</span>
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gray-700 hover:bg-gray-600 px-2 py-2 rounded">
                   <input
                     type="checkbox"
                     checked={selectedLayerData.italic}
                     onChange={(e) => updateLayer(selectedLayer, { italic: e.target.checked })}
+                    className="hidden"
                   />
-                  <span className="text-sm">Italic</span>
+                  <span className={`text-lg italic font-serif ${selectedLayerData.italic ? 'text-blue-400' : 'text-gray-400'}`}>I</span>
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gray-700 hover:bg-gray-600 px-2 py-2 rounded">
                   <input
                     type="checkbox"
                     checked={selectedLayerData.underline || false}
                     onChange={(e) => updateLayer(selectedLayer, { underline: e.target.checked })}
+                    className="hidden"
                   />
-                  <span className="text-sm">Underline</span>
+                  <span className={`text-lg underline ${selectedLayerData.underline ? 'text-blue-400' : 'text-gray-400'}`}>U</span>
                 </label>
               </div>
 
@@ -1952,20 +2039,16 @@ export default function App() {
                   onChange={(e) => updateLayer(selectedLayer, { fontFamily: e.target.value })}
                   className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
                 >
-                  <option value="Arial">Arial</option>
-                  <option value="Impact">Impact</option>
-                  <option value="Georgia">Georgia</option>
-                  <option value="Times New Roman">Times New Roman</option>
-                  <option value="Courier New">Courier New</option>
-                  <option value="Verdana">Verdana</option>
-                  <option value="'Roboto', sans-serif">Roboto</option>
-                  <option value="'Open Sans', sans-serif">Open Sans</option>
-                  <option value="'Montserrat', sans-serif">Montserrat</option>
+                  <option value="Impact, 'Arial Black', sans-serif">Impact</option>
+                  <option value="'Anton', sans-serif">Anton</option>
+                  <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
                   <option value="'Oswald', sans-serif">Oswald</option>
-                  <option value="'Bebas Neue', cursive">Bebas Neue</option>
-                  <option value="'Pacifico', cursive">Pacifico</option>
-                  <option value="'Bangers', cursive">Bangers</option>
+                  <option value="'Montserrat', sans-serif">Montserrat</option>
+                  <option value="'League Spartan', sans-serif">League Spartan</option>
+                  <option value="'Roboto Condensed', sans-serif">Roboto Condensed</option>
+                  <option value="'Luckiest Guy', sans-serif">Luckiest Guy</option>
                   <option value="'Permanent Marker', cursive">Permanent Marker</option>
+                  <option value="'Arial Black', sans-serif">Arial Black</option>
                 </select>
               </div>
 
@@ -2614,6 +2697,16 @@ export default function App() {
                 />
                 <span className="text-sm">Show Rulers</span>
               </label>
+            </div>
+
+            <div className="border-t border-gray-700 pt-3 mt-3">
+              <button
+                onClick={clearAll}
+                className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+              >
+                Clear All
+              </button>
+              <p className="text-xs text-gray-500 mt-1 text-center">Remove all layers and reset canvas</p>
             </div>
           </div>
         </div>
