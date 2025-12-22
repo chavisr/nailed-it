@@ -25,7 +25,6 @@ const DEFAULT_CANVAS = {
   showGrid: false,
   gridSize: 20,
   gridColor: '#444444',
-  showRulers: false,
   // Background image adjustments
   bgBrightness: 100,
   bgContrast: 100,
@@ -1863,33 +1862,6 @@ export default function App() {
           }
         }}>
           <div className="relative" style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}>
-            {canvasSettings.showRulers && (
-              <>
-                <div 
-                  className="absolute -top-6 left-0 h-6 bg-gray-800 border-b border-gray-600 flex items-end text-xs text-gray-400"
-                  style={{ width: `${canvasSettings.width}px` }}
-                >
-                  {Array.from({ length: Math.floor(canvasSettings.width / 100) + 1 }, (_, i) => (
-                    <div key={i} className="relative" style={{ width: `100px` }}>
-                      <span className="absolute left-0 bottom-0 px-1">{i * 100}</span>
-                      <div className="absolute bottom-0 left-0 w-px h-2 bg-gray-500"></div>
-                    </div>
-                  ))}
-                </div>
-                <div 
-                  className="absolute -left-6 top-0 w-6 bg-gray-800 border-r border-gray-600 text-xs text-gray-400"
-                  style={{ height: `${canvasSettings.height}px` }}
-                >
-                  {Array.from({ length: Math.floor(canvasSettings.height / 100) + 1 }, (_, i) => (
-                    <div key={i} className="relative" style={{ height: `100px` }}>
-                      <span className="absolute top-0 left-0 px-1 transform -rotate-90 origin-top-left whitespace-nowrap" style={{ transformOrigin: '0 0' }}>{i * 100}</span>
-                      <div className="absolute top-0 left-4 h-px w-2 bg-gray-500"></div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-            
             <canvas
               ref={canvasRef}
               width={canvasSettings.width}
@@ -2760,7 +2732,7 @@ export default function App() {
               </>
             )}
 
-            <div className="border-t border-gray-700 pt-3 mt-3">
+            <div className="mb-3">
               <label className="flex items-center gap-2 mb-2">
                 <input
                   type="checkbox"
@@ -2803,17 +2775,6 @@ export default function App() {
                   </div>
                 </>
               )}
-            </div>
-
-            <div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={canvasSettings.showRulers}
-                  onChange={(e) => setCanvasSettings({...canvasSettings, showRulers: e.target.checked})}
-                />
-                <span className="text-sm">Show Rulers</span>
-              </label>
             </div>
 
             <div className="border-t border-gray-700 pt-3 mt-3">
