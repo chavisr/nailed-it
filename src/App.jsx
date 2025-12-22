@@ -25,7 +25,13 @@ const DEFAULT_CANVAS = {
   showGrid: false,
   gridSize: 20,
   gridColor: '#444444',
-  showRulers: false
+  showRulers: false,
+  // Background image adjustments
+  bgBrightness: 100,
+  bgContrast: 100,
+  bgSaturation: 100,
+  bgHue: 0,
+  bgFilter: 'none'
 };
 
 const IMAGE_FILTERS = {
@@ -70,11 +76,16 @@ export default function App() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Delete' && selectedLayer && !cropMode) {
+      // Check if user is typing in an input or textarea
+      const isTyping = e.target.tagName === 'INPUT' || 
+                       e.target.tagName === 'TEXTAREA' || 
+                       e.target.isContentEditable;
+      
+      if (e.key === 'Delete' && selectedLayer && !cropMode && !isTyping) {
         deleteLayer(selectedLayer);
       }
       
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedLayer && !cropMode) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedLayer && !cropMode && !isTyping) {
         e.preventDefault();
         const layerToCopy = layers.find(l => l.id === selectedLayer);
         if (layerToCopy) {
@@ -82,7 +93,7 @@ export default function App() {
         }
       }
       
-      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && copiedLayer && !cropMode) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && copiedLayer && !cropMode && !isTyping) {
         e.preventDefault();
         const newLayer = {
           ...copiedLayer,
@@ -94,7 +105,8 @@ export default function App() {
         setSelectedLayer(newLayer.id);
       }
       
-      if (selectedLayer && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !cropMode) {
+      // Only move layers with arrow keys if NOT typing in a text field
+      if (selectedLayer && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !cropMode && !isTyping) {
         e.preventDefault();
         const layer = layers.find(l => l.id === selectedLayer);
         if (layer) {
@@ -182,7 +194,52 @@ export default function App() {
     ctx.save();
     ctx.globalAlpha = canvasSettings.bgOpacity;
     
-    if (canvasSettings.bgBlur > 0) {
+    // Apply background image filters if there's a background image
+    if (canvasSettings.bgImage) {
+      const bgFilters = [];
+      
+      if (canvasSettings.bgBrightness !== 100) {
+        bgFilters.push(`brightness(${canvasSettings.bgBrightness}%)`);
+      }
+      if (canvasSettings.bgContrast !== 100) {
+        bgFilters.push(`contrast(${canvasSettings.bgContrast}%)`);
+      }
+      if (canvasSettings.bgSaturation !== 100) {
+        bgFilters.push(`saturate(${canvasSettings.bgSaturation}%)`);
+      }
+      if (canvasSettings.bgHue !== 0) {
+        bgFilters.push(`hue-rotate(${canvasSettings.bgHue}deg)`);
+      }
+      
+      switch (canvasSettings.bgFilter) {
+        case 'grayscale':
+          bgFilters.push('grayscale(100%)');
+          break;
+        case 'sepia':
+          bgFilters.push('sepia(100%)');
+          break;
+        case 'invert':
+          bgFilters.push('invert(100%)');
+          break;
+        case 'vintage':
+          bgFilters.push('sepia(40%) contrast(110%) brightness(90%)');
+          break;
+        case 'cool':
+          bgFilters.push('hue-rotate(180deg) saturate(120%)');
+          break;
+        case 'warm':
+          bgFilters.push('sepia(20%) saturate(130%) brightness(105%)');
+          break;
+      }
+      
+      if (canvasSettings.bgBlur > 0) {
+        bgFilters.push(`blur(${canvasSettings.bgBlur}px)`);
+      }
+      
+      if (bgFilters.length > 0) {
+        ctx.filter = bgFilters.join(' ');
+      }
+    } else if (canvasSettings.bgBlur > 0) {
       ctx.filter = `blur(${canvasSettings.bgBlur}px)`;
     }
     
@@ -358,6 +415,22 @@ export default function App() {
           
           // Draw fill text
           ctx.fillText(line, xPos, yPos);
+          
+          // Draw underline if enabled
+          if (layer.underline) {
+            const textWidth = ctx.measureText(line).width;
+            const underlineY = yPos + layer.fontSize * 0.1; // Position underline slightly below text
+            const underlineThickness = Math.max(1, layer.fontSize * 0.05); // Scale with font size
+            
+            ctx.save();
+            ctx.strokeStyle = layer.textEffect === 'gradient' ? layer.color : ctx.fillStyle;
+            ctx.lineWidth = underlineThickness;
+            ctx.beginPath();
+            ctx.moveTo(xPos, underlineY);
+            ctx.lineTo(xPos + textWidth, underlineY);
+            ctx.stroke();
+            ctx.restore();
+          }
         });
         
         // Reset transformation
@@ -524,6 +597,7 @@ export default function App() {
       color: '#ffffff',
       bold: false,
       italic: false,
+      underline: false,
       strokeWidth: 0,
       strokeColor: '#000000',
       textEffect: 'none',
@@ -646,6 +720,7 @@ export default function App() {
             color: '#ffffff',
             bold: false,
             italic: false,
+            underline: false,
             visible: true,
             opacity: 1,
             blur: 0,
@@ -1055,7 +1130,52 @@ export default function App() {
     ctx.save();
     ctx.globalAlpha = canvasSettings.bgOpacity;
     
-    if (canvasSettings.bgBlur > 0) {
+    // Apply background image filters if there's a background image
+    if (canvasSettings.bgImage) {
+      const bgFilters = [];
+      
+      if (canvasSettings.bgBrightness !== 100) {
+        bgFilters.push(`brightness(${canvasSettings.bgBrightness}%)`);
+      }
+      if (canvasSettings.bgContrast !== 100) {
+        bgFilters.push(`contrast(${canvasSettings.bgContrast}%)`);
+      }
+      if (canvasSettings.bgSaturation !== 100) {
+        bgFilters.push(`saturate(${canvasSettings.bgSaturation}%)`);
+      }
+      if (canvasSettings.bgHue !== 0) {
+        bgFilters.push(`hue-rotate(${canvasSettings.bgHue}deg)`);
+      }
+      
+      switch (canvasSettings.bgFilter) {
+        case 'grayscale':
+          bgFilters.push('grayscale(100%)');
+          break;
+        case 'sepia':
+          bgFilters.push('sepia(100%)');
+          break;
+        case 'invert':
+          bgFilters.push('invert(100%)');
+          break;
+        case 'vintage':
+          bgFilters.push('sepia(40%) contrast(110%) brightness(90%)');
+          break;
+        case 'cool':
+          bgFilters.push('hue-rotate(180deg) saturate(120%)');
+          break;
+        case 'warm':
+          bgFilters.push('sepia(20%) saturate(130%) brightness(105%)');
+          break;
+      }
+      
+      if (canvasSettings.bgBlur > 0) {
+        bgFilters.push(`blur(${canvasSettings.bgBlur}px)`);
+      }
+      
+      if (bgFilters.length > 0) {
+        ctx.filter = bgFilters.join(' ');
+      }
+    } else if (canvasSettings.bgBlur > 0) {
       ctx.filter = `blur(${canvasSettings.bgBlur}px)`;
     }
     
@@ -1210,6 +1330,22 @@ export default function App() {
           }
           
           ctx.fillText(line, xPos, yPos);
+          
+          // Draw underline if enabled
+          if (layer.underline) {
+            const textWidth = ctx.measureText(line).width;
+            const underlineY = yPos + layer.fontSize * 0.1;
+            const underlineThickness = Math.max(1, layer.fontSize * 0.05);
+            
+            ctx.save();
+            ctx.strokeStyle = layer.textEffect === 'gradient' ? layer.color : ctx.fillStyle;
+            ctx.lineWidth = underlineThickness;
+            ctx.beginPath();
+            ctx.moveTo(xPos, underlineY);
+            ctx.lineTo(xPos + textWidth, underlineY);
+            ctx.stroke();
+            ctx.restore();
+          }
         });
         
         if (layer.rotation) {
@@ -1372,48 +1508,17 @@ export default function App() {
         <p className="text-sm text-gray-400 mb-6">
           Thumbnail Editor
         </p>
-        
-        <h2 className="text-xl font-bold mb-4">Tools</h2>
-
-        <div className="space-y-2 mb-6">
-          <button
-            onClick={() => setSelectedLayer(null)}
-            className="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded"
-          >
-            <Settings size={18} />
-            Canvas Settings
-          </button>
-          <button
-            onClick={pasteFromClipboard}
-            className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded"
-          >
-            <ClipboardPaste size={18} />
-            Paste from Clipboard
-          </button>
-          <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded cursor-pointer">
-            <ImagePlus size={18} />
-            Add Image
-            <input type="file" accept="image/*" onChange={addImage} className="hidden" />
-          </label>
-          <button
-            onClick={addText}
-            className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
-          >
-            <Type size={18} />
-            Add Text
-          </button>
-          <button
-            onClick={exportImage}
-            className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
-          >
-            <Download size={18} />
-            Export PNG
-          </button>
-        </div>
 
         <h2 className="text-xl font-bold mb-3">Layers</h2>
         <div className="space-y-2">
-          {[...layers].reverse().map((layer, idx) => {
+          {layers.length === 0 ? (
+            <div className="text-center py-8 px-4">
+              <p className="text-gray-400 text-sm mb-2">No layers yet</p>
+              <p className="text-gray-500 text-xs">Add an image or text to get started</p>
+            </div>
+          ) : (
+            <>
+              {[...layers].reverse().map((layer, idx) => {
             const actualIndex = layers.length - 1 - idx;
             const isDragOver = dragOverIndex === actualIndex;
             return (
@@ -1454,6 +1559,8 @@ export default function App() {
               </div>
             );
           })}
+            </>
+          )}
         </div>
       </div>
 
@@ -1463,6 +1570,44 @@ export default function App() {
             setSelectedLayer(null);
           }
         }}>
+          <div className={`flex items-center gap-2 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
+            <button
+              onClick={() => setSelectedLayer(null)}
+              className="flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm"
+              title="Canvas Settings"
+            >
+              <Settings size={18} />
+            </button>
+            <button
+              onClick={pasteFromClipboard}
+              className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded text-sm"
+              title="Paste from Clipboard"
+            >
+              <ClipboardPaste size={18} />
+            </button>
+            <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded cursor-pointer text-sm"
+              title="Add Image">
+              <ImagePlus size={18} />
+              <input type="file" accept="image/*" onChange={addImage} className="hidden" />
+            </label>
+            <button
+              onClick={addText}
+              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm"
+              title="Add Text"
+            >
+              <Type size={18} />
+            </button>
+            <button
+              onClick={exportImage}
+              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm"
+              title="Export PNG"
+            >
+              <Download size={18} />
+            </button>
+          </div>
+
+          <div className="h-6 w-px bg-gray-600"></div>
+
           <div className={`flex items-center gap-4 flex-1 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
             <div className="flex items-center gap-2">
               <button
@@ -1763,6 +1908,34 @@ export default function App() {
                   rows="3"
                 />
               </div>
+
+              <div className="mb-3 grid grid-cols-3 gap-2">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedLayerData.bold}
+                    onChange={(e) => updateLayer(selectedLayer, { bold: e.target.checked })}
+                  />
+                  <span className="text-sm">Bold</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedLayerData.italic}
+                    onChange={(e) => updateLayer(selectedLayer, { italic: e.target.checked })}
+                  />
+                  <span className="text-sm">Italic</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedLayerData.underline || false}
+                    onChange={(e) => updateLayer(selectedLayer, { underline: e.target.checked })}
+                  />
+                  <span className="text-sm">Underline</span>
+                </label>
+              </div>
+
               <div className="mb-3">
                 <label className="block text-sm mb-1">Font Size</label>
                 <input
@@ -1893,28 +2066,6 @@ export default function App() {
                   />
                 </div>
               )}
-
-              <div className="mb-3">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedLayerData.bold}
-                    onChange={(e) => updateLayer(selectedLayer, { bold: e.target.checked })}
-                  />
-                  <span className="text-sm">Bold</span>
-                </label>
-              </div>
-              
-              <div className="mb-3">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedLayerData.italic}
-                    onChange={(e) => updateLayer(selectedLayer, { italic: e.target.checked })}
-                  />
-                  <span className="text-sm">Italic</span>
-                </label>
-              </div>
 
               <div className="mb-3">
                 <div className="flex items-center justify-between mb-1">
@@ -2302,6 +2453,112 @@ export default function App() {
                 className="w-full"
               />
             </div>
+
+            {/* Background Image Filters - Only show if background image exists */}
+            {canvasSettings.bgImage && (
+              <>
+                <div className="border-t border-gray-700 pt-3 mt-3">
+                  <label className="block text-sm mb-2 font-semibold">Background Image Adjustments</label>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm">Brightness: {canvasSettings.bgBrightness}%</label>
+                    <button
+                      onClick={() => setCanvasSettings({...canvasSettings, bgBrightness: 100})}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset Brightness"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="200"
+                    value={canvasSettings.bgBrightness}
+                    onChange={(e) => setCanvasSettings({...canvasSettings, bgBrightness: +e.target.value})}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm">Contrast: {canvasSettings.bgContrast}%</label>
+                    <button
+                      onClick={() => setCanvasSettings({...canvasSettings, bgContrast: 100})}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset Contrast"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="200"
+                    value={canvasSettings.bgContrast}
+                    onChange={(e) => setCanvasSettings({...canvasSettings, bgContrast: +e.target.value})}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm">Saturation: {canvasSettings.bgSaturation}%</label>
+                    <button
+                      onClick={() => setCanvasSettings({...canvasSettings, bgSaturation: 100})}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset Saturation"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="200"
+                    value={canvasSettings.bgSaturation}
+                    onChange={(e) => setCanvasSettings({...canvasSettings, bgSaturation: +e.target.value})}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm">Hue: {canvasSettings.bgHue}°</label>
+                    <button
+                      onClick={() => setCanvasSettings({...canvasSettings, bgHue: 0})}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset Hue"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="360"
+                    value={canvasSettings.bgHue}
+                    onChange={(e) => setCanvasSettings({...canvasSettings, bgHue: +e.target.value})}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm mb-1">Filter</label>
+                  <select
+                    value={canvasSettings.bgFilter}
+                    onChange={(e) => setCanvasSettings({...canvasSettings, bgFilter: e.target.value})}
+                    className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                  >
+                    {Object.entries(IMAGE_FILTERS).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
 
             <div className="border-t border-gray-700 pt-3 mt-3">
               <label className="flex items-center gap-2 mb-2">
