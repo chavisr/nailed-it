@@ -1816,8 +1816,9 @@ export default function App() {
                     selectedLayer === layer.id || selectedLayers.includes(layer.id) ? 'ring-2 ring-blue-500' : ''
                   }`}
                   onClick={(e) => {
-                    if (e.ctrlKey || e.metaKey) {
-                      // Multi-select from layer list
+                    // If already in multi-select mode OR Ctrl is pressed
+                    if (selectedLayers.length > 0 || e.ctrlKey || e.metaKey) {
+                      // Multi-select mode: toggle selection
                       if (selectedLayers.includes(layer.id)) {
                         setSelectedLayers(selectedLayers.filter(id => id !== layer.id));
                       } else {
@@ -1832,6 +1833,7 @@ export default function App() {
                       }
                       setSelectedLayer(null);
                     } else {
+                      // Single select mode
                       setSelectedLayer(layer.id);
                       setSelectedLayers([]);
                     }
