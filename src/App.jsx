@@ -986,6 +986,17 @@ export default function App() {
         }
       }
       
+      // If clicking on a layer that's part of current multi-selection without Ctrl,
+      // start dragging all selected layers instead of clearing selection
+      if (selectedLayers.length > 0 && selectedLayers.includes(clickedLayer.id)) {
+        // Start dragging multi-selected layers
+        if (!cropMode) {
+          setIsDragging(true);
+          setDragStart({ x: x, y: y }); // Use absolute position for multi-drag
+        }
+        return;
+      }
+      
       // Clear multi-selection when clicking without Ctrl
       setSelectedLayers([]);
       setSelectedLayer(clickedLayer.id);
