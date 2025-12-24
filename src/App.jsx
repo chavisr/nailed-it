@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, Trash2, ImagePlus, Type, Download, ZoomIn, ZoomOut, FlipHorizontal, FlipVertical, RotateCw, ArrowRightLeft, Crop, Check, X, Settings, ClipboardPaste, RotateCcw } from 'lucide-react';
+import { Eye, EyeOff, Trash2, ImagePlus, Type, Download, ZoomIn, ZoomOut, FlipHorizontal, FlipVertical, RotateCw, ArrowRightLeft, Crop, Check, X, Settings, ClipboardPaste, RotateCcw, Github } from 'lucide-react';
 
 // Load Google Fonts
 const loadGoogleFonts = () => {
@@ -1857,20 +1857,21 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
-      <div className={`w-64 bg-gray-800 p-4 overflow-y-auto ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`} onMouseDown={(e) => {
+      <div className={`w-64 bg-gray-800 flex flex-col ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`} onMouseDown={(e) => {
         if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
           setSelectedLayer(null);
         }
       }}>
-        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-          Nailed-it
-        </h1>
-        <p className="text-sm text-gray-400 mb-6">
-          Thumbnail Editor
-        </p>
+        <div className="p-4 overflow-y-auto flex-1">
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Nailed-it
+          </h1>
+          <p className="text-sm text-gray-400 mb-6">
+            Thumbnail Editor
+          </p>
 
-        <h2 className="text-xl font-bold mb-3">Layers</h2>
-        <div className="space-y-2">
+          <h2 className="text-xl font-bold mb-3">Layers</h2>
+          <div className="space-y-2">
           {layers.length === 0 ? (
             <div className="text-center py-8 px-4">
               <p className="text-gray-400 text-sm mb-2">No layers yet</p>
@@ -1951,6 +1952,20 @@ export default function App() {
           })}
             </>
           )}
+          </div>
+        </div>
+        
+        <div className="p-4 border-t border-gray-700">
+          <a 
+            href="https://github.com/chavisr/nailed-it"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+            title="View on GitHub"
+          >
+            <Github size={18} />
+            <span>GitHub</span>
+          </a>
         </div>
       </div>
 
