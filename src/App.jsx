@@ -166,7 +166,7 @@ export default function App() {
         }
       }
       
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedLayer && !cropMode && !isTyping && selectedLayers.length === 0) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedLayer && !cropMode && !deleteConfirmation && !isTyping && selectedLayers.length === 0) {
         e.preventDefault();
         const layerToCopy = layers.find(l => l.id === selectedLayer);
         if (layerToCopy) {
@@ -174,7 +174,7 @@ export default function App() {
         }
       }
       
-      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && copiedLayer && !cropMode && !isTyping && selectedLayers.length === 0) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && copiedLayer && !cropMode && !deleteConfirmation && !isTyping && selectedLayers.length === 0) {
         e.preventDefault();
         const newLayer = {
           ...copiedLayer,
@@ -187,7 +187,7 @@ export default function App() {
       }
       
       // Only move layers with arrow keys if NOT typing in a text field
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !cropMode && !isTyping) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !cropMode && !deleteConfirmation && !isTyping) {
         e.preventDefault();
         const step = e.shiftKey ? 10 : 5;
         
@@ -219,7 +219,7 @@ export default function App() {
       }
       
       // Ctrl+A to select all layers
-      if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !isTyping) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !deleteConfirmation && !isTyping) {
         e.preventDefault();
         const allLayerIds = layers.map(l => l.id);
         setSelectedLayers(allLayerIds);
@@ -878,6 +878,8 @@ export default function App() {
   };
 
   const handleCanvasMouseDown = (e) => {
+    if (deleteConfirmation) return;
+    
     const rect = canvasRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / zoom;
     const y = (e.clientY - rect.top) / zoom;
@@ -994,6 +996,8 @@ export default function App() {
   };
 
   const handleCanvasMouseMove = (e) => {
+    if (deleteConfirmation) return;
+    
     const rect = canvasRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / zoom;
     const y = (e.clientY - rect.top) / zoom;
@@ -1299,6 +1303,8 @@ export default function App() {
   };
 
   const handleCanvasMouseUp = () => {
+    if (deleteConfirmation) return;
+    
     setIsDragging(false);
     setResizing(null);
     setCropDragging(false);
@@ -1790,8 +1796,8 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
-      <div className={`w-64 bg-gray-800 p-4 overflow-y-auto ${cropMode ? 'pointer-events-none opacity-50' : ''}`} onMouseDown={(e) => {
-        if (e.target === e.currentTarget && !cropMode) {
+      <div className={`w-64 bg-gray-800 p-4 overflow-y-auto ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`} onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
           setSelectedLayer(null);
         }
       }}>
@@ -1879,11 +1885,11 @@ export default function App() {
 
       <div className="flex-1 flex flex-col bg-gray-950">
         <div className="p-4 bg-gray-800 flex items-center gap-4 border-b border-gray-700" onMouseDown={(e) => {
-          if (e.target === e.currentTarget && !cropMode) {
+          if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
             setSelectedLayer(null);
           }
         }}>
-          <div className={`flex items-center gap-2 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
+          <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <button
               onClick={() => setSelectedLayer(null)}
               className="flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm"
@@ -1895,7 +1901,7 @@ export default function App() {
 
           <div className="h-6 w-px bg-gray-600"></div>
 
-          <div className={`flex items-center gap-2 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
+          <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <button
               onClick={exportProject}
               className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded text-sm"
@@ -1914,7 +1920,7 @@ export default function App() {
 
           <div className="h-6 w-px bg-gray-600"></div>
 
-          <div className={`flex items-center gap-2 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
+          <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <button
               onClick={pasteFromClipboard}
               className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded text-sm"
@@ -1943,7 +1949,7 @@ export default function App() {
             </button>
           </div>
 
-          {(selectedLayer || selectedLayers.length > 0) && !cropMode && (
+          {(selectedLayer || selectedLayers.length > 0) && !cropMode && !deleteConfirmation && (
             <>
               <div className="h-6 w-px bg-gray-600"></div>
               <div className="flex items-center gap-2">
@@ -1966,7 +1972,7 @@ export default function App() {
 
           <div className="h-6 w-px bg-gray-600"></div>
 
-          <div className={`flex items-center gap-4 flex-1 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
+          <div className={`flex items-center gap-4 flex-1 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}
@@ -2037,7 +2043,7 @@ export default function App() {
         </div>
 
         <div className="flex-1 flex items-center justify-center p-8 overflow-auto" onMouseDown={(e) => {
-          if (e.target === e.currentTarget && !cropMode) {
+          if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
             setSelectedLayer(null);
           }
         }}>
@@ -2051,13 +2057,13 @@ export default function App() {
               onMouseUp={handleCanvasMouseUp}
               onMouseLeave={handleCanvasMouseUp}
               onWheel={(e) => {
-                if (!cropMode) {
+                if (!cropMode && !deleteConfirmation) {
                   e.preventDefault();
                   const delta = e.deltaY > 0 ? -0.1 : 0.1;
                   setZoom(Math.max(0.1, Math.min(3, zoom + delta)));
                 }
               }}
-              className="border border-gray-700 shadow-2xl cursor-crosshair"
+              className={`border border-gray-700 shadow-2xl ${deleteConfirmation ? 'pointer-events-none opacity-50' : 'cursor-crosshair'}`}
             />
           </div>
         </div>
@@ -2065,7 +2071,7 @@ export default function App() {
 
       {selectedLayerData && selectedLayers.length === 0 ? (
         <div className="w-80 bg-gray-800 overflow-y-auto relative">
-          <div className={`p-4 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
+          <div className={`p-4 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <h2 className="text-xl font-bold mb-4">Properties</h2>
           
           <div className="mb-4">
@@ -2636,7 +2642,7 @@ export default function App() {
           </div>
         </div>
       ) : (
-        <div className={`w-80 bg-gray-800 p-4 overflow-y-auto ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
+        <div className={`w-80 bg-gray-800 p-4 overflow-y-auto ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
           <h2 className="text-xl font-bold mb-4">Canvas Settings</h2>
 
           <div className="space-y-3">
