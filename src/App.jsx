@@ -2028,33 +2028,26 @@ export default function App() {
 
           <div className="h-6 w-px bg-gray-600"></div>
 
-          <div className="flex items-center gap-2">
-            {layers.length === 0 && (
-              <div className="flex items-center gap-2 mr-2 animate-pulse">
-                <span className="text-sm font-semibold text-yellow-400">← Start here</span>
-              </div>
-            )}
-            <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
-              <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded cursor-pointer text-sm"
-                title="Add Image">
-                <ImagePlus size={18} />
-                <input type="file" accept="image/*" onChange={addImage} className="hidden" />
-              </label>
-              <button
-                onClick={addText}
-                className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm"
-                title="Add Text"
-              >
-                <Type size={18} />
-              </button>
-              <button
-                onClick={exportImage}
-                className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm"
-                title="Export PNG"
-              >
-                <Download size={18} />
-              </button>
-            </div>
+          <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
+            <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded cursor-pointer text-sm"
+              title="Add Image">
+              <ImagePlus size={18} />
+              <input type="file" accept="image/*" onChange={addImage} className="hidden" />
+            </label>
+            <button
+              onClick={addText}
+              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm"
+              title="Add Text"
+            >
+              <Type size={18} />
+            </button>
+            <button
+              onClick={exportImage}
+              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm"
+              title="Download PNG"
+            >
+              <Download size={18} />
+            </button>
           </div>
 
           {(selectedLayer || selectedLayers.length > 0) && !cropMode && !deleteConfirmation && (
