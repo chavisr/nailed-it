@@ -1543,7 +1543,7 @@ export default function App() {
     if (!selectedLayer) return;
     const layer = layers.find(l => l.id === selectedLayer);
     if (layer) {
-      updateLayer(selectedLayer, { rotation: (layer.rotation + 90) % 360 });
+      updateLayer(selectedLayer, { rotation: (layer.rotation + 15) % 360 });
     }
   };
 
