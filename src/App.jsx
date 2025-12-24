@@ -2028,29 +2028,33 @@ export default function App() {
 
           <div className="h-6 w-px bg-gray-600"></div>
 
-          <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
-            <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded cursor-pointer text-sm"
-              title="Add Image">
-              <ImagePlus size={18} />
-              <span className="font-medium">Image</span>
-              <input type="file" accept="image/*" onChange={addImage} className="hidden" />
-            </label>
-            <button
-              onClick={addText}
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm"
-              title="Add Text"
-            >
-              <Type size={18} />
-              <span className="font-medium">Text</span>
-            </button>
-            <button
-              onClick={exportImage}
-              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm"
-              title="Export PNG"
-            >
-              <Download size={18} />
-              <span className="font-medium">Export</span>
-            </button>
+          <div className="flex items-center gap-2">
+            {layers.length === 0 && (
+              <div className="flex items-center gap-2 mr-2 animate-pulse">
+                <span className="text-sm font-semibold text-yellow-400">← Start here</span>
+              </div>
+            )}
+            <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
+              <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded cursor-pointer text-sm"
+                title="Add Image">
+                <ImagePlus size={18} />
+                <input type="file" accept="image/*" onChange={addImage} className="hidden" />
+              </label>
+              <button
+                onClick={addText}
+                className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm"
+                title="Add Text"
+              >
+                <Type size={18} />
+              </button>
+              <button
+                onClick={exportImage}
+                className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm"
+                title="Export PNG"
+              >
+                <Download size={18} />
+              </button>
+            </div>
           </div>
 
           {(selectedLayer || selectedLayers.length > 0) && !cropMode && !deleteConfirmation && (
@@ -2169,58 +2173,6 @@ export default function App() {
               }}
               className={`border border-gray-700 shadow-2xl ${deleteConfirmation ? 'pointer-events-none opacity-50' : 'cursor-crosshair'}`}
             />
-            
-            {/* Empty State Overlay - Show when no layers */}
-            {layers.length === 0 && !cropMode && !deleteConfirmation && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="bg-gray-800/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border-2 border-gray-700 max-w-md pointer-events-auto">
-                  <div className="text-center">
-                    <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                      Get Started
-                    </h2>
-                    <p className="text-gray-300 mb-6 text-sm">
-                      Create your thumbnail by adding layers
-                    </p>
-                    
-                    <div className="space-y-3 mb-6">
-                      <label className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-lg cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-lg">
-                        <ImagePlus size={24} />
-                        <span className="font-semibold text-lg">Add Image</span>
-                        <input type="file" accept="image/*" onChange={addImage} className="hidden" />
-                      </label>
-                      
-                      <button
-                        onClick={addText}
-                        className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 px-6 py-4 rounded-lg transition-all hover:scale-105 active:scale-95 shadow-lg"
-                      >
-                        <Type size={24} />
-                        <span className="font-semibold text-lg">Add Text</span>
-                      </button>
-                    </div>
-                    
-                    <div className="border-t border-gray-700 pt-4">
-                      <p className="text-gray-400 text-xs mb-3 font-semibold uppercase tracking-wide">
-                        Quick Tips
-                      </p>
-                      <div className="space-y-2 text-sm text-gray-300">
-                        <div className="flex items-center gap-2 bg-gray-700/50 px-3 py-2 rounded">
-                          <span className="text-blue-400 font-mono text-xs bg-gray-900 px-2 py-1 rounded">Ctrl+V</span>
-                          <span className="text-xs">Paste images or text</span>
-                        </div>
-                        <div className="flex items-center gap-2 bg-gray-700/50 px-3 py-2 rounded">
-                          <span className="text-green-400 font-mono text-xs bg-gray-900 px-2 py-1 rounded">Ctrl+D</span>
-                          <span className="text-xs">Duplicate selected layer</span>
-                        </div>
-                        <div className="flex items-center gap-2 bg-gray-700/50 px-3 py-2 rounded">
-                          <span className="text-purple-400 font-mono text-xs bg-gray-900 px-2 py-1 rounded">Arrows</span>
-                          <span className="text-xs">Move layers (Shift for 10px)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
