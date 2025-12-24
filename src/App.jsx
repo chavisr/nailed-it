@@ -2305,6 +2305,7 @@ export default function App() {
                   <option value="'Roboto Condensed', sans-serif">Roboto Condensed</option>
                   <option value="'Luckiest Guy', sans-serif">Luckiest Guy</option>
                   <option value="'Permanent Marker', cursive">Permanent Marker</option>
+                  <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
                   <option value="'Noto Sans Thai', sans-serif">Noto Sans Thai</option>
                   <option value="'Sarabun', sans-serif">Sarabun (Thai)</option>
                   <option value="'Arial Black', sans-serif">Arial Black</option>
