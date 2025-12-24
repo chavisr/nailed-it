@@ -2096,13 +2096,6 @@ export default function App() {
                     <FlipVertical size={16} />
                     Flip V
                   </button>
-                  <button
-                    onClick={rotateLayer}
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
-                  >
-                    <RotateCw size={16} />
-                    Rotate 90°
-                  </button>
                 </div>
                 
                 {!cropMode && (
@@ -2216,13 +2209,22 @@ export default function App() {
               <div className="mb-3">
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-sm">Rotation: {selectedLayerData.rotation}°</label>
-                  <button
-                    onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
-                    title="Reset Rotation"
-                  >
-                    <RotateCcw size={14} />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={rotateLayer}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Rotate 90°"
+                    >
+                      <RotateCw size={14} />
+                    </button>
+                    <button
+                      onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset Rotation"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
                 </div>
                 <input
                   type="range"
@@ -2408,13 +2410,22 @@ export default function App() {
               <div className="mb-3">
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-sm">Rotation: {selectedLayerData.rotation || 0}°</label>
-                  <button
-                    onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
-                    title="Reset Rotation"
-                  >
-                    <RotateCcw size={14} />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={rotateLayer}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Rotate 90°"
+                    >
+                      <RotateCw size={14} />
+                    </button>
+                    <button
+                      onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset Rotation"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
                 </div>
                 <input
                   type="range"
