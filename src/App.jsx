@@ -965,8 +965,8 @@ export default function App() {
     const isCtrlPressed = e.ctrlKey || e.metaKey;
 
     if (clickedLayer) {
-      // Multi-selection mode: if already in multi-select OR Ctrl is pressed
-      if (selectedLayers.length > 0 || isCtrlPressed) {
+      // Multi-selection mode: Ctrl is pressed
+      if (isCtrlPressed) {
         if (selectedLayers.includes(clickedLayer.id)) {
           // Deselect if already selected in multi-selection
           setSelectedLayers(selectedLayers.filter(id => id !== clickedLayer.id));
@@ -986,6 +986,8 @@ export default function App() {
         }
       }
       
+      // Clear multi-selection when clicking without Ctrl
+      setSelectedLayers([]);
       setSelectedLayer(clickedLayer.id);
       
       const handleSize = 16;
@@ -1907,9 +1909,9 @@ export default function App() {
                     selectedLayer === layer.id || selectedLayers.includes(layer.id) ? 'ring-2 ring-blue-500' : ''
                   }`}
                   onClick={(e) => {
-                    // If already in multi-select mode OR Ctrl is pressed
-                    if (selectedLayers.length > 0 || e.ctrlKey || e.metaKey) {
-                      // Multi-select mode: toggle selection
+                    // Ctrl is pressed: multi-select mode
+                    if (e.ctrlKey || e.metaKey) {
+                      // Toggle selection
                       if (selectedLayers.includes(layer.id)) {
                         setSelectedLayers(selectedLayers.filter(id => id !== layer.id));
                       } else {
