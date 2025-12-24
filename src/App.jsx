@@ -1943,6 +1943,27 @@ export default function App() {
             </button>
           </div>
 
+          {(selectedLayer || selectedLayers.length > 0) && !cropMode && (
+            <>
+              <div className="h-6 w-px bg-gray-600"></div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (selectedLayers.length > 0) {
+                      setDeleteConfirmation({ type: 'multiple', ids: selectedLayers });
+                    } else if (selectedLayer) {
+                      setDeleteConfirmation({ type: 'single', ids: [selectedLayer] });
+                    }
+                  }}
+                  className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-2 rounded text-sm"
+                  title="Delete Selected Layer(s)"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </>
+          )}
+
           <div className="h-6 w-px bg-gray-600"></div>
 
           <div className={`flex items-center gap-4 flex-1 ${cropMode ? 'pointer-events-none opacity-50' : ''}`}>
