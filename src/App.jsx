@@ -24,7 +24,7 @@ const DEFAULT_CANVAS = {
   bgBlur: 0,
   showGrid: false,
   gridSize: 20,
-  gridColor: '#888888',
+  gridColor: '#7D7D7D',
   // Background image adjustments
   bgBrightness: 100,
   bgContrast: 100,
@@ -365,7 +365,7 @@ export default function App() {
     // Draw grid if enabled
     if (canvasSettings.showGrid) {
       ctx.save();
-      ctx.strokeStyle = canvasSettings.gridColor || '#888888';
+      ctx.strokeStyle = canvasSettings.gridColor || '#7D7D7D';
       ctx.lineWidth = 1;
       ctx.globalAlpha = 0.3;
       
@@ -3099,7 +3099,7 @@ export default function App() {
                     <label className="block text-xs mb-1">Grid Color</label>
                     <input
                       type="color"
-                      value={canvasSettings.gridColor || '#888888'}
+                      value={canvasSettings.gridColor || '#7D7D7D'}
                       onChange={(e) => setCanvasSettings({...canvasSettings, gridColor: e.target.value})}
                       className="w-full h-6 bg-gray-700 rounded cursor-pointer"
                     />
