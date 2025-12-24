@@ -38,11 +38,7 @@ const IMAGE_FILTERS = {
   grayscale: 'Grayscale',
   sepia: 'Sepia',
   invert: 'Invert',
-  blur: 'Blur',
-  sharpen: 'Sharpen',
-  vintage: 'Vintage',
-  cool: 'Cool',
-  warm: 'Warm'
+  vintage: 'Vintage'
 };
 
 export default function App() {
@@ -280,12 +276,6 @@ export default function App() {
       case 'vintage':
         filters.push('sepia(40%) contrast(110%) brightness(90%)');
         break;
-      case 'cool':
-        filters.push('hue-rotate(180deg) saturate(120%)');
-        break;
-      case 'warm':
-        filters.push('sepia(20%) saturate(130%) brightness(105%)');
-        break;
     }
     
     // Blur
@@ -337,12 +327,6 @@ export default function App() {
           break;
         case 'vintage':
           bgFilters.push('sepia(40%) contrast(110%) brightness(90%)');
-          break;
-        case 'cool':
-          bgFilters.push('hue-rotate(180deg) saturate(120%)');
-          break;
-        case 'warm':
-          bgFilters.push('sepia(20%) saturate(130%) brightness(105%)');
           break;
       }
       
@@ -1356,12 +1340,6 @@ export default function App() {
         case 'vintage':
           bgFilters.push('sepia(40%) contrast(110%) brightness(90%)');
           break;
-        case 'cool':
-          bgFilters.push('hue-rotate(180deg) saturate(120%)');
-          break;
-        case 'warm':
-          bgFilters.push('sepia(20%) saturate(130%) brightness(105%)');
-          break;
       }
       
       if (canvasSettings.bgBlur > 0) {
@@ -1430,12 +1408,6 @@ export default function App() {
             break;
           case 'vintage':
             filters.push('sepia(40%) contrast(110%) brightness(90%)');
-            break;
-          case 'cool':
-            filters.push('hue-rotate(180deg) saturate(120%)');
-            break;
-          case 'warm':
-            filters.push('sepia(20%) saturate(130%) brightness(105%)');
             break;
         }
         
