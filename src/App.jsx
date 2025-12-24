@@ -425,7 +425,23 @@ export default function App() {
         }
 
         ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
-        ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+        
+        // Apply 3D rotation (Z-axis is normal rotation)
+        const rotX = (layer.rotateX || 0) * Math.PI / 180;
+        const rotY = (layer.rotateY || 0) * Math.PI / 180;
+        const rotZ = (layer.rotateZ || 0) * Math.PI / 180;
+        
+        // Apply Z rotation (normal rotation)
+        ctx.rotate(rotZ);
+        
+        // Apply 3D effect for X and Y rotation
+        const scaleX = Math.cos(rotY);
+        const scaleY = Math.cos(rotX);
+        const skewX = Math.sin(rotY) * 0.5;
+        const skewY = Math.sin(rotX) * 0.5;
+        
+        ctx.transform(scaleX, skewY, skewX, scaleY, 0, 0);
+        
         ctx.scale(layer.flipH ? -1 : 1, layer.flipV ? -1 : 1);
         
         // Draw border first if needed (using image alpha as mask)
@@ -512,12 +528,27 @@ export default function App() {
           }, 0);
         }
         
-        // Apply rotation if present
-        if (layer.rotation) {
-          ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
-          ctx.rotate((layer.rotation || 0) * Math.PI / 180);
-          ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
+        // Apply 3D rotation (Z-axis is normal rotation)
+        const txtRotX = (layer.rotateX || 0) * Math.PI / 180;
+        const txtRotY = (layer.rotateY || 0) * Math.PI / 180;
+        const txtRotZ = (layer.rotateZ || 0) * Math.PI / 180;
+        
+        ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
+        
+        // Apply Z rotation (normal rotation)
+        ctx.rotate(txtRotZ);
+        
+        // Apply 3D effect for X and Y rotation
+        if (txtRotX !== 0 || txtRotY !== 0) {
+          const txtScaleX = Math.cos(txtRotY);
+          const txtScaleY = Math.cos(txtRotX);
+          const txtSkewX = Math.sin(txtRotY) * 0.5;
+          const txtSkewY = Math.sin(txtRotX) * 0.5;
+          
+          ctx.transform(txtScaleX, txtSkewY, txtSkewX, txtScaleY, 0, 0);
         }
+        
+        ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
         
         lines.forEach((line, index) => {
           const yPos = layer.y + layer.fontSize + (index * lineHeight);
@@ -553,9 +584,7 @@ export default function App() {
         });
         
         // Reset transformation
-        if (layer.rotation) {
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
-        }
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
       }
 
       ctx.restore();
@@ -696,7 +725,9 @@ export default function App() {
           visible: true,
           opacity: 1,
           blur: 0,
-          rotation: 0,
+          rotateX: 0,
+          rotateY: 0,
+          rotateZ: 0,
           flipH: false,
           flipV: false,
           border: { width: 0, color: '#ffffff' },
@@ -740,7 +771,9 @@ export default function App() {
       visible: true,
       opacity: 1,
       blur: 0,
-      rotation: 0,
+      rotateX: 0,
+      rotateY: 0,
+      rotateZ: 0,
       border: { width: 0, color: '#000000' },
       shadow: { offsetX: 0, offsetY: 0, blur: 0, color: '#000000' }
     };
@@ -1450,7 +1483,23 @@ export default function App() {
         }
 
         ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
-        ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+        
+        // Apply 3D rotation (Z-axis is normal rotation)
+        const imgRotX = (layer.rotateX || 0) * Math.PI / 180;
+        const imgRotY = (layer.rotateY || 0) * Math.PI / 180;
+        const imgRotZ = (layer.rotateZ || 0) * Math.PI / 180;
+        
+        // Apply Z rotation (normal rotation)
+        ctx.rotate(imgRotZ);
+        
+        // Apply 3D effect for X and Y rotation
+        const imgScaleX = Math.cos(imgRotY);
+        const imgScaleY = Math.cos(imgRotX);
+        const imgSkewX = Math.sin(imgRotY) * 0.5;
+        const imgSkewY = Math.sin(imgRotX) * 0.5;
+        
+        ctx.transform(imgScaleX, imgSkewY, imgSkewX, imgScaleY, 0, 0);
+        
         ctx.scale(layer.flipH ? -1 : 1, layer.flipV ? -1 : 1);
         
         // Draw border first if needed (using image alpha as mask)
@@ -1522,11 +1571,27 @@ export default function App() {
         const lineHeightMultiplier = layer.lineHeight || 1.2;
         const lineHeight = layer.fontSize * lineHeightMultiplier;
         
-        if (layer.rotation) {
-          ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
-          ctx.rotate((layer.rotation || 0) * Math.PI / 180);
-          ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
+        // Apply 3D rotation (Z-axis is normal rotation)
+        const exportTxtRotX = (layer.rotateX || 0) * Math.PI / 180;
+        const exportTxtRotY = (layer.rotateY || 0) * Math.PI / 180;
+        const exportTxtRotZ = (layer.rotateZ || 0) * Math.PI / 180;
+        
+        ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
+        
+        // Apply Z rotation (normal rotation)
+        ctx.rotate(exportTxtRotZ);
+        
+        // Apply 3D effect for X and Y rotation
+        if (exportTxtRotX !== 0 || exportTxtRotY !== 0) {
+          const exportTxtScaleX = Math.cos(exportTxtRotY);
+          const exportTxtScaleY = Math.cos(exportTxtRotX);
+          const exportTxtSkewX = Math.sin(exportTxtRotY) * 0.5;
+          const exportTxtSkewY = Math.sin(exportTxtRotX) * 0.5;
+          
+          ctx.transform(exportTxtScaleX, exportTxtSkewY, exportTxtSkewX, exportTxtScaleY, 0, 0);
         }
+        
+        ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
         
         lines.forEach((line, index) => {
           const yPos = layer.y + layer.fontSize + (index * lineHeight);
@@ -1559,9 +1624,7 @@ export default function App() {
           }
         });
         
-        if (layer.rotation) {
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
-        }
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
       }
 
       ctx.restore();
@@ -1582,13 +1645,7 @@ export default function App() {
     }
   };
 
-  const rotateLayer = () => {
-    if (!selectedLayer) return;
-    const layer = layers.find(l => l.id === selectedLayer);
-    if (layer) {
-      updateLayer(selectedLayer, { rotation: (layer.rotation + 90) % 360 });
-    }
-  };
+
 
   const startCropMode = () => {
     if (!selectedLayer) return;
@@ -1630,9 +1687,9 @@ export default function App() {
 
     tempCtx.save();
     
-    if (layer.rotation || layer.flipH || layer.flipV) {
+    if (layer.rotateZ || layer.flipH || layer.flipV) {
       tempCtx.translate(cropRelWidth / 2, cropRelHeight / 2);
-      tempCtx.rotate((layer.rotation || 0) * Math.PI / 180);
+      tempCtx.rotate((layer.rotateZ || 0) * Math.PI / 180);
       tempCtx.scale(layer.flipH ? -1 : 1, layer.flipV ? -1 : 1);
       
       tempCtx.drawImage(
@@ -1661,7 +1718,9 @@ export default function App() {
         aspectRatio: cropBox.width / cropBox.height,
         x: cropBox.x,
         y: cropBox.y,
-        rotation: 0,
+        rotateX: 0,
+        rotateY: 0,
+        rotateZ: 0,
         flipH: false,
         flipV: false
       });
@@ -2264,34 +2323,62 @@ export default function App() {
 
               {/* Transform */}
               <div className="mb-4 pb-4 border-b border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-400 mb-2">TRANSFORM</h3>
+                <h3 className="text-sm font-semibold text-gray-400 mb-2">3D ROTATION</h3>
                 
+                <div className="mb-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm">3D Rotation</label>
+                    <button
+                      onClick={() => updateLayer(selectedLayer, { rotateX: 0, rotateY: 0, rotateZ: 0 })}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset All Rotations"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="block text-sm mb-1">X-axis (Tilt): {selectedLayerData.rotateX || 0}°</label>
+                  <input
+                    type="range"
+                    min="-180"
+                    max="180"
+                    value={selectedLayerData.rotateX || 0}
+                    onChange={(e) => updateLayer(selectedLayer, { rotateX: +e.target.value })}
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="block text-sm mb-1">Y-axis (Pan): {selectedLayerData.rotateY || 0}°</label>
+                  <input
+                    type="range"
+                    min="-180"
+                    max="180"
+                    value={selectedLayerData.rotateY || 0}
+                    onChange={(e) => updateLayer(selectedLayer, { rotateY: +e.target.value })}
+                    className="w-full"
+                  />
+                </div>
+
                 <div className="mb-0">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-sm">Rotation: {selectedLayerData.rotation}°</label>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={rotateLayer}
-                        className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
-                        title="Rotate 90°"
-                      >
-                        90°
-                      </button>
-                      <button
-                        onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
-                        className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
-                        title="Reset Rotation"
-                      >
-                        <RotateCcw size={14} />
-                      </button>
-                    </div>
+                    <label className="text-sm">Z-axis (Rotation): {selectedLayerData.rotateZ || 0}°</label>
+                    <button
+                      onClick={() => updateLayer(selectedLayer, { rotateZ: (selectedLayerData.rotateZ || 0) + 90 })}
+                      className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
+                      title="Rotate 90°"
+                    >
+                      90°
+                    </button>
                   </div>
                   <input
                     type="range"
                     min="0"
                     max="360"
-                    value={selectedLayerData.rotation}
-                    onChange={(e) => updateLayer(selectedLayer, { rotation: +e.target.value })}
+                    value={selectedLayerData.rotateZ || 0}
+                    onChange={(e) => updateLayer(selectedLayer, { rotateZ: +e.target.value })}
                     className="w-full"
                   />
                 </div>
@@ -2488,34 +2575,62 @@ export default function App() {
 
               {/* Transform */}
               <div className="mb-4 pb-4 border-b border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-400 mb-2">TRANSFORM</h3>
+                <h3 className="text-sm font-semibold text-gray-400 mb-2">3D ROTATION</h3>
                 
+                <div className="mb-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm">3D Rotation</label>
+                    <button
+                      onClick={() => updateLayer(selectedLayer, { rotateX: 0, rotateY: 0, rotateZ: 0 })}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset All Rotations"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="block text-sm mb-1">X-axis (Tilt): {selectedLayerData.rotateX || 0}°</label>
+                  <input
+                    type="range"
+                    min="-180"
+                    max="180"
+                    value={selectedLayerData.rotateX || 0}
+                    onChange={(e) => updateLayer(selectedLayer, { rotateX: +e.target.value })}
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="block text-sm mb-1">Y-axis (Pan): {selectedLayerData.rotateY || 0}°</label>
+                  <input
+                    type="range"
+                    min="-180"
+                    max="180"
+                    value={selectedLayerData.rotateY || 0}
+                    onChange={(e) => updateLayer(selectedLayer, { rotateY: +e.target.value })}
+                    className="w-full"
+                  />
+                </div>
+
                 <div className="mb-0">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-sm">Rotation: {selectedLayerData.rotation || 0}°</label>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={rotateLayer}
-                        className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
-                        title="Rotate 90°"
-                      >
-                        90°
-                      </button>
-                      <button
-                        onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
-                        className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
-                        title="Reset Rotation"
-                      >
-                        <RotateCcw size={14} />
-                      </button>
-                    </div>
+                    <label className="text-sm">Z-axis (Rotation): {selectedLayerData.rotateZ || 0}°</label>
+                    <button
+                      onClick={() => updateLayer(selectedLayer, { rotateZ: (selectedLayerData.rotateZ || 0) + 90 })}
+                      className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
+                      title="Rotate 90°"
+                    >
+                      90°
+                    </button>
                   </div>
                   <input
                     type="range"
                     min="0"
                     max="360"
-                    value={selectedLayerData.rotation || 0}
-                    onChange={(e) => updateLayer(selectedLayer, { rotation: +e.target.value })}
+                    value={selectedLayerData.rotateZ || 0}
+                    onChange={(e) => updateLayer(selectedLayer, { rotateZ: +e.target.value })}
                     className="w-full"
                   />
                 </div>
