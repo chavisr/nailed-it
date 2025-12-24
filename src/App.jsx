@@ -14,9 +14,9 @@ const loadGoogleFonts = () => {
 const DEFAULT_CANVAS = { 
   width: 1280, 
   height: 720, 
-  bgColor: '#1a1a1a', 
+  bgColor: '#000000', 
   bgType: 'solid',
-  bgGradientStart: '#1a1a1a',
+  bgGradientStart: '#000000',
   bgGradientEnd: '#4a4a4a',
   bgGradientAngle: 45,
   bgImage: null, 
@@ -1969,7 +1969,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col bg-gray-950">
+      <div className="flex-1 flex flex-col bg-gray-700">
         <div className="p-4 bg-gray-800 flex items-center gap-4 border-b border-gray-700" onMouseDown={(e) => {
           if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
             setSelectedLayer(null);
