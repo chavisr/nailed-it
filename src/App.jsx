@@ -219,6 +219,14 @@ export default function App() {
         }
       }
       
+      // Ctrl+A to select all layers
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !isTyping) {
+        e.preventDefault();
+        const allLayerIds = layers.map(l => l.id);
+        setSelectedLayers(allLayerIds);
+        setSelectedLayer(null); // Clear single selection when multi-selecting
+      }
+      
       // Escape key to deselect all
       if (e.key === 'Escape' && !isTyping) {
         setSelectedLayers([]);
