@@ -1856,17 +1856,17 @@ export default function App() {
   const selectedLayerData = layers.find(l => l.id === selectedLayer);
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      <div className={`w-64 bg-gray-800 flex flex-col ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`} onMouseDown={(e) => {
+    <div className="flex h-screen bg-gruvbox-bg0 text-gruvbox-fg1">
+      <div className={`w-64 bg-gruvbox-bg1 flex flex-col ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`} onMouseDown={(e) => {
         if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
           setSelectedLayer(null);
         }
       }}>
         <div className="p-4 overflow-y-auto flex-1">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-gruvbox-yellow to-gruvbox-orange bg-clip-text text-transparent">
             Nailed-it
           </h1>
-          <p className="text-sm text-gray-400 mb-6">
+          <p className="text-sm text-gruvbox-fg3 mb-6">
             Thumbnail Editor
           </p>
 
@@ -1874,8 +1874,8 @@ export default function App() {
           <div className="space-y-2">
           {layers.length === 0 ? (
             <div className="text-center py-8 px-4">
-              <p className="text-gray-400 text-sm mb-2">No layers yet</p>
-              <p className="text-gray-500 text-xs">Add an image or text to get started</p>
+              <p className="text-gruvbox-fg3 text-sm mb-2">No layers yet</p>
+              <p className="text-gruvbox-fg4 text-xs">Add an image or text to get started</p>
             </div>
           ) : (
             <>
@@ -1885,7 +1885,7 @@ export default function App() {
             return (
               <div key={layer.id} className="relative">
                 {isDragOver && (
-                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-500 z-10"></div>
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gruvbox-yellow z-10"></div>
                 )}
                 <div
                   draggable
@@ -1902,8 +1902,8 @@ export default function App() {
                       setDragOverIndex(null);
                     }
                   }}
-                  className={`p-2 bg-gray-700 rounded flex items-center gap-2 cursor-move ${
-                    selectedLayer === layer.id || selectedLayers.includes(layer.id) ? 'ring-2 ring-blue-500' : ''
+                  className={`p-2 bg-gruvbox-bg2 rounded flex items-center gap-2 cursor-move ${
+                    selectedLayer === layer.id || selectedLayers.includes(layer.id) ? 'ring-2 ring-gruvbox-yellow' : ''
                   }`}
                   onClick={(e) => {
                     // If already in multi-select mode OR Ctrl is pressed
@@ -1944,7 +1944,7 @@ export default function App() {
                       confirmDeleteLayer(layer.id);
                     }
                   }}>
-                    <Trash2 size={16} className="text-red-400" />
+                    <Trash2 size={16} className="text-gruvbox-red" />
                   </button>
                 </div>
               </div>
@@ -1955,12 +1955,12 @@ export default function App() {
           </div>
         </div>
         
-        <div className="p-4 border-t border-gray-700">
+        <div className="p-4 border-t border-gruvbox-bg3">
           <a 
             href="https://github.com/chavisr/nailed-it"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+            className="flex items-center gap-2 text-gruvbox-fg3 hover:text-white transition-colors text-sm"
             title="View on GitHub"
           >
             <Github size={18} />
@@ -1969,8 +1969,8 @@ export default function App() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col bg-gray-950">
-        <div className="p-4 bg-gray-800 flex items-center gap-4 border-b border-gray-700" onMouseDown={(e) => {
+      <div className="flex-1 flex flex-col bg-gruvbox-bg0">
+        <div className="p-4 bg-gruvbox-bg1 flex items-center gap-4 border-b border-gruvbox-bg3" onMouseDown={(e) => {
           if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
             setSelectedLayer(null);
           }
@@ -1978,13 +1978,13 @@ export default function App() {
           <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <button
               onClick={exportProject}
-              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded text-sm"
+              className="flex items-center justify-center gap-2 bg-gruvbox-blue hover:bg-gruvbox-blue/80 px-3 py-2 rounded text-sm"
               title="Save Project"
             >
               <Download size={16} />
               <span className="text-xs">Save</span>
             </button>
-            <label className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded cursor-pointer text-sm"
+            <label className="flex items-center justify-center gap-2 bg-gruvbox-blue hover:bg-gruvbox-blue/80 px-3 py-2 rounded cursor-pointer text-sm"
               title="Load Project">
               <ImagePlus size={16} />
               <span className="text-xs">Load</span>
@@ -1992,31 +1992,31 @@ export default function App() {
             </label>
           </div>
 
-          <div className="h-6 w-px bg-gray-600"></div>
+          <div className="h-6 w-px bg-gruvbox-bg3"></div>
 
           <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <button
               onClick={pasteFromClipboard}
-              className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded text-sm"
+              className="flex items-center justify-center gap-2 bg-gruvbox-orange hover:bg-gruvbox-orange/80 px-3 py-2 rounded text-sm"
               title="Paste from Clipboard"
             >
               <ClipboardPaste size={18} />
             </button>
-            <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded cursor-pointer text-sm"
+            <label className="flex items-center justify-center gap-2 bg-gruvbox-aqua hover:bg-gruvbox-aqua/80 px-3 py-2 rounded cursor-pointer text-sm"
               title="Add Image">
               <ImagePlus size={18} />
               <input type="file" accept="image/*" onChange={addImage} className="hidden" />
             </label>
             <button
               onClick={addText}
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm"
+              className="flex items-center justify-center gap-2 bg-gruvbox-green hover:bg-gruvbox-green/80 px-3 py-2 rounded text-sm"
               title="Add Text"
             >
               <Type size={18} />
             </button>
             <button
               onClick={exportImage}
-              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm"
+              className="flex items-center justify-center gap-2 bg-gruvbox-purple hover:bg-gruvbox-purple/80 px-3 py-2 rounded text-sm"
               title="Export PNG"
             >
               <Download size={18} />
@@ -2025,7 +2025,7 @@ export default function App() {
 
           {(selectedLayer || selectedLayers.length > 0) && !cropMode && !deleteConfirmation && (
             <>
-              <div className="h-6 w-px bg-gray-600"></div>
+              <div className="h-6 w-px bg-gruvbox-bg3"></div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
@@ -2035,7 +2035,7 @@ export default function App() {
                       setDeleteConfirmation({ type: 'single', ids: [selectedLayer] });
                     }
                   }}
-                  className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-2 rounded text-sm"
+                  className="flex items-center justify-center gap-2 bg-gruvbox-red hover:bg-gruvbox-red/80 px-3 py-2 rounded text-sm"
                   title="Delete Selected Layer(s)"
                 >
                   <Trash2 size={18} />
@@ -2044,13 +2044,13 @@ export default function App() {
             </>
           )}
 
-          <div className="h-6 w-px bg-gray-600"></div>
+          <div className="h-6 w-px bg-gruvbox-bg3"></div>
 
           <div className={`flex items-center gap-4 flex-1 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}
-                className="p-2 bg-gray-700 hover:bg-gray-600 rounded"
+                className="p-2 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                 title="Zoom Out"
               >
                 <ZoomOut size={18} />
@@ -2058,14 +2058,14 @@ export default function App() {
               <span className="text-sm w-16 text-center">{(zoom * 100).toFixed(0)}%</span>
               <button
                 onClick={() => setZoom(Math.min(3, zoom + 0.1))}
-                className="p-2 bg-gray-700 hover:bg-gray-600 rounded"
+                className="p-2 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                 title="Zoom In"
               >
                 <ZoomIn size={18} />
               </button>
               <button
                 onClick={() => setZoom(1)}
-                className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+                className="px-3 py-2 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded text-sm"
                 title="Reset Zoom"
               >
                 Reset Zoom
@@ -2075,17 +2075,17 @@ export default function App() {
           
           {cropMode && (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-400 mr-2">Hold <strong>Shift</strong> to maintain ratio</span>
+              <span className="text-sm text-gruvbox-fg3 mr-2">Hold <strong>Shift</strong> to maintain ratio</span>
               <button
                 onClick={applyCrop}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-gruvbox-green hover:bg-gruvbox-green/80 rounded text-sm font-medium"
               >
                 <Check size={18} />
                 Apply Crop
               </button>
               <button
                 onClick={cancelCrop}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-gruvbox-red hover:bg-gruvbox-red/80 rounded text-sm font-medium"
               >
                 <X size={18} />
                 Cancel
@@ -2095,19 +2095,19 @@ export default function App() {
           
           {deleteConfirmation && (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-400 mr-2">
+              <span className="text-sm text-gruvbox-fg3 mr-2">
                 Delete {deleteConfirmation.ids.length} layer{deleteConfirmation.ids.length > 1 ? 's' : ''}?
               </span>
               <button
                 onClick={() => deleteLayer(deleteConfirmation.ids)}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-gruvbox-red hover:bg-gruvbox-red/80 rounded text-sm font-medium"
               >
                 <Check size={18} />
                 Confirm Delete
               </button>
               <button
                 onClick={cancelDelete}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-gruvbox-bg3 hover:bg-gruvbox-bg2 rounded text-sm font-medium"
               >
                 <X size={18} />
                 Cancel
@@ -2137,14 +2137,14 @@ export default function App() {
                   setZoom(Math.max(0.1, Math.min(3, zoom + delta)));
                 }
               }}
-              className={`border border-gray-700 shadow-2xl ${deleteConfirmation ? 'pointer-events-none opacity-50' : 'cursor-crosshair'}`}
+              className={`border border-gruvbox-bg3 shadow-2xl ${deleteConfirmation ? 'pointer-events-none opacity-50' : 'cursor-crosshair'}`}
             />
           </div>
         </div>
       </div>
 
       {selectedLayerData && selectedLayers.length === 0 ? (
-        <div className="w-80 bg-gray-800 overflow-y-auto relative">
+        <div className="w-80 bg-gruvbox-bg1 overflow-y-auto relative">
           <div className={`p-4 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
             <h2 className="text-xl font-bold mb-4">Properties</h2>
           
@@ -2156,7 +2156,7 @@ export default function App() {
                   type="number"
                   value={Math.round(selectedLayerData.x)}
                   onChange={(e) => updateLayer(selectedLayer, { x: +e.target.value })}
-                  className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded text-sm"
                 />
               </div>
               <div>
@@ -2165,7 +2165,7 @@ export default function App() {
                   type="number"
                   value={Math.round(selectedLayerData.y)}
                   onChange={(e) => updateLayer(selectedLayer, { y: +e.target.value })}
-                  className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded text-sm"
                 />
               </div>
             </div>
@@ -2178,14 +2178,14 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-2 mb-2">
                   <button
                     onClick={() => flipLayer(true)}
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded text-sm"
                   >
                     <FlipHorizontal size={16} />
                     Flip H
                   </button>
                   <button
                     onClick={() => flipLayer(false)}
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded text-sm"
                   >
                     <FlipVertical size={16} />
                     Flip V
@@ -2195,7 +2195,7 @@ export default function App() {
                 {!cropMode && (
                   <button
                     onClick={startCropMode}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gruvbox-blue hover:bg-gruvbox-blue/80 rounded text-sm"
                   >
                     <Crop size={16} />
                     Start Crop
@@ -2208,7 +2208,7 @@ export default function App() {
                   <label className="text-sm">Brightness: {selectedLayerData.brightness}%</label>
                   <button
                     onClick={() => updateLayer(selectedLayer, { brightness: 100 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset Brightness"
                   >
                     <RotateCcw size={14} />
@@ -2229,7 +2229,7 @@ export default function App() {
                   <label className="text-sm">Contrast: {selectedLayerData.contrast}%</label>
                   <button
                     onClick={() => updateLayer(selectedLayer, { contrast: 100 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset Contrast"
                   >
                     <RotateCcw size={14} />
@@ -2250,7 +2250,7 @@ export default function App() {
                   <label className="text-sm">Saturation: {selectedLayerData.saturation}%</label>
                   <button
                     onClick={() => updateLayer(selectedLayer, { saturation: 100 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset Saturation"
                   >
                     <RotateCcw size={14} />
@@ -2271,7 +2271,7 @@ export default function App() {
                   <label className="text-sm">Hue: {selectedLayerData.hue}°</label>
                   <button
                     onClick={() => updateLayer(selectedLayer, { hue: 0 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset Hue"
                   >
                     <RotateCcw size={14} />
@@ -2292,7 +2292,7 @@ export default function App() {
                 <select
                   value={selectedLayerData.filter}
                   onChange={(e) => updateLayer(selectedLayer, { filter: e.target.value })}
-                  className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded text-sm"
                 >
                   {Object.entries(IMAGE_FILTERS).map(([value, label]) => (
                     <option key={value} value={value}>{label}</option>
@@ -2306,14 +2306,14 @@ export default function App() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={rotateLayer}
-                      className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
+                      className="px-2 py-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded text-xs font-semibold"
                       title="Rotate 90°"
                     >
                       90°
                     </button>
                     <button
                       onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                       title="Reset Rotation"
                     >
                       <RotateCcw size={14} />
@@ -2335,7 +2335,7 @@ export default function App() {
                   <label className="text-sm">3D Rotation</label>
                   <button
                     onClick={() => updateLayer(selectedLayer, { rotateX: 0, rotateY: 0 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset 3D Rotation"
                   >
                     <RotateCcw size={14} />
@@ -2376,38 +2376,38 @@ export default function App() {
                 <textarea
                   value={selectedLayerData.text}
                   onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })}
-                  className="w-full bg-gray-700 px-2 py-1 rounded resize-none"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded resize-none"
                   rows="3"
                 />
               </div>
 
               <div className="mb-3 grid grid-cols-3 gap-2">
-                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gray-700 hover:bg-gray-600 px-2 py-2 rounded">
+                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gruvbox-bg2 hover:bg-gruvbox-bg3 px-2 py-2 rounded">
                   <input
                     type="checkbox"
                     checked={selectedLayerData.bold}
                     onChange={(e) => updateLayer(selectedLayer, { bold: e.target.checked })}
                     className="hidden"
                   />
-                  <span className={`text-lg font-bold ${selectedLayerData.bold ? 'text-blue-400' : 'text-gray-400'}`}>B</span>
+                  <span className={`text-lg font-bold ${selectedLayerData.bold ? 'text-blue-400' : 'text-gruvbox-fg3'}`}>B</span>
                 </label>
-                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gray-700 hover:bg-gray-600 px-2 py-2 rounded">
+                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gruvbox-bg2 hover:bg-gruvbox-bg3 px-2 py-2 rounded">
                   <input
                     type="checkbox"
                     checked={selectedLayerData.italic}
                     onChange={(e) => updateLayer(selectedLayer, { italic: e.target.checked })}
                     className="hidden"
                   />
-                  <span className={`text-lg italic font-serif ${selectedLayerData.italic ? 'text-blue-400' : 'text-gray-400'}`}>I</span>
+                  <span className={`text-lg italic font-serif ${selectedLayerData.italic ? 'text-blue-400' : 'text-gruvbox-fg3'}`}>I</span>
                 </label>
-                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gray-700 hover:bg-gray-600 px-2 py-2 rounded">
+                <label className="flex items-center justify-center gap-1 cursor-pointer bg-gruvbox-bg2 hover:bg-gruvbox-bg3 px-2 py-2 rounded">
                   <input
                     type="checkbox"
                     checked={selectedLayerData.underline || false}
                     onChange={(e) => updateLayer(selectedLayer, { underline: e.target.checked })}
                     className="hidden"
                   />
-                  <span className={`text-lg underline ${selectedLayerData.underline ? 'text-blue-400' : 'text-gray-400'}`}>U</span>
+                  <span className={`text-lg underline ${selectedLayerData.underline ? 'text-blue-400' : 'text-gruvbox-fg3'}`}>U</span>
                 </label>
               </div>
 
@@ -2417,7 +2417,7 @@ export default function App() {
                   type="number"
                   value={selectedLayerData.fontSize}
                   onChange={(e) => updateLayer(selectedLayer, { fontSize: +e.target.value })}
-                  className="w-full bg-gray-700 px-2 py-1 rounded"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded"
                 />
               </div>
               <div className="mb-3">
@@ -2425,7 +2425,7 @@ export default function App() {
                 <select
                   value={selectedLayerData.fontFamily}
                   onChange={(e) => updateLayer(selectedLayer, { fontFamily: e.target.value })}
-                  className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded text-sm"
                 >
                   <option value="Impact, 'Arial Black', sans-serif">Impact</option>
                   <option value="'Anton', sans-serif">Anton</option>
@@ -2448,7 +2448,7 @@ export default function App() {
                 <select
                   value={selectedLayerData.textEffect || 'none'}
                   onChange={(e) => updateLayer(selectedLayer, { textEffect: e.target.value })}
-                  className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded text-sm"
                 >
                   <option value="none">Solid Color</option>
                   <option value="gradient">Gradient</option>
@@ -2462,7 +2462,7 @@ export default function App() {
                     type="color"
                     value={selectedLayerData.color}
                     onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })}
-                    className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                    className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                   />
                 </div>
               ) : (
@@ -2473,7 +2473,7 @@ export default function App() {
                       type="color"
                       value={selectedLayerData.gradientStart || selectedLayerData.color}
                       onChange={(e) => updateLayer(selectedLayer, { gradientStart: e.target.value })}
-                      className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                      className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                     />
                   </div>
                   <div className="mb-3">
@@ -2482,7 +2482,7 @@ export default function App() {
                       type="color"
                       value={selectedLayerData.gradientEnd || '#ff0000'}
                       onChange={(e) => updateLayer(selectedLayer, { gradientEnd: e.target.value })}
-                      className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                      className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                     />
                   </div>
                   <div className="mb-3">
@@ -2490,7 +2490,7 @@ export default function App() {
                       <label className="text-sm">Gradient Angle: {selectedLayerData.gradientAngle || 0}°</label>
                       <button
                         onClick={() => updateLayer(selectedLayer, { gradientAngle: 0 })}
-                        className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                        className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                         title="Reset Gradient Angle"
                       >
                         <RotateCcw size={14} />
@@ -2513,7 +2513,7 @@ export default function App() {
                   <label className="text-sm">Stroke Width: {selectedLayerData.strokeWidth || 0}px</label>
                   <button
                     onClick={() => updateLayer(selectedLayer, { strokeWidth: 0 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset Stroke Width"
                   >
                     <RotateCcw size={14} />
@@ -2536,7 +2536,7 @@ export default function App() {
                     type="color"
                     value={selectedLayerData.strokeColor || '#000000'}
                     onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })}
-                    className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                    className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                   />
                 </div>
               )}
@@ -2547,14 +2547,14 @@ export default function App() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={rotateLayer}
-                      className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
+                      className="px-2 py-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded text-xs font-semibold"
                       title="Rotate 90°"
                     >
                       90°
                     </button>
                     <button
                       onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                       title="Reset Rotation"
                     >
                       <RotateCcw size={14} />
@@ -2576,7 +2576,7 @@ export default function App() {
                   <label className="text-sm">3D Rotation</label>
                   <button
                     onClick={() => updateLayer(selectedLayer, { rotateX: 0, rotateY: 0 })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset 3D Rotation"
                   >
                     <RotateCcw size={14} />
@@ -2615,7 +2615,7 @@ export default function App() {
               <label className="text-sm">Opacity: {selectedLayerData.opacity.toFixed(2)}</label>
               <button
                 onClick={() => updateLayer(selectedLayer, { opacity: 1 })}
-                className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                 title="Reset Opacity"
               >
                 <RotateCcw size={14} />
@@ -2637,7 +2637,7 @@ export default function App() {
               <label className="text-sm">Blur: {selectedLayerData.blur}px</label>
               <button
                 onClick={() => updateLayer(selectedLayer, { blur: 0 })}
-                className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                 title="Reset Blur"
               >
                 <RotateCcw size={14} />
@@ -2662,7 +2662,7 @@ export default function App() {
                     onClick={() => updateLayer(selectedLayer, { 
                       border: { ...selectedLayerData.border, width: 0 }
                     })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset Border Width"
                   >
                     <RotateCcw size={14} />
@@ -2688,7 +2688,7 @@ export default function App() {
                     onChange={(e) => updateLayer(selectedLayer, { 
                       border: { ...selectedLayerData.border, color: e.target.value }
                     })}
-                    className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                    className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                   />
                 </div>
               )}
@@ -2702,7 +2702,7 @@ export default function App() {
                 onClick={() => updateLayer(selectedLayer, { 
                   shadow: { ...selectedLayerData.shadow, blur: 0 }
                 })}
-                className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                 title="Reset Shadow Blur"
               >
                 <RotateCcw size={14} />
@@ -2728,7 +2728,7 @@ export default function App() {
                     onClick={() => updateLayer(selectedLayer, { 
                       shadow: { ...selectedLayerData.shadow, offsetX: 0 }
                     })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset Shadow Offset X"
                   >
                     <RotateCcw size={14} />
@@ -2752,7 +2752,7 @@ export default function App() {
                     onClick={() => updateLayer(selectedLayer, { 
                       shadow: { ...selectedLayerData.shadow, offsetY: 0 }
                     })}
-                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                     title="Reset Shadow Offset Y"
                   >
                     <RotateCcw size={14} />
@@ -2777,7 +2777,7 @@ export default function App() {
                   onChange={(e) => updateLayer(selectedLayer, { 
                     shadow: { ...selectedLayerData.shadow, color: e.target.value }
                   })}
-                  className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                  className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                 />
               </div>
             </>
@@ -2785,7 +2785,7 @@ export default function App() {
           </div>
         </div>
       ) : selectedLayers.length > 0 ? (
-        <div className="w-80 bg-gray-800 p-4 overflow-y-auto">
+        <div className="w-80 bg-gruvbox-bg1 p-4 overflow-y-auto">
           <h2 className="text-xl font-bold mb-4">Multi-Selection</h2>
           <div className="text-center py-8 px-4">
             <div className="space-y-2 text-sm text-gray-300">
@@ -2797,7 +2797,7 @@ export default function App() {
           </div>
         </div>
       ) : (
-        <div className={`w-80 bg-gray-800 p-4 overflow-y-auto ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
+        <div className={`w-80 bg-gruvbox-bg1 p-4 overflow-y-auto ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
           <h2 className="text-xl font-bold mb-4">Canvas Settings</h2>
 
           <div className="space-y-3">
@@ -2810,7 +2810,7 @@ export default function App() {
                     setCanvasSettings({...canvasSettings, width: w, height: h});
                   }
                 }}
-                className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                className="w-full bg-gruvbox-bg2 px-2 py-1 rounded text-sm"
                 value={`${canvasSettings.width}x${canvasSettings.height}`}
               >
                 <option value="1280x720">YouTube (1280x720)</option>
@@ -2828,13 +2828,13 @@ export default function App() {
                   type="number"
                   value={canvasSettings.width}
                   onChange={(e) => setCanvasSettings({...canvasSettings, width: +e.target.value})}
-                  className="w-full bg-gray-700 px-2 py-1 rounded"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded"
                 />
               </div>
               
               <button
                 onClick={swapDimensions}
-                className="p-2 bg-indigo-600 hover:bg-indigo-700 rounded"
+                className="p-2 bg-gruvbox-blue hover:bg-gruvbox-blue/80 rounded"
                 title="Swap Width and Height"
               >
                 <ArrowRightLeft size={18} />
@@ -2846,7 +2846,7 @@ export default function App() {
                   type="number"
                   value={canvasSettings.height}
                   onChange={(e) => setCanvasSettings({...canvasSettings, height: +e.target.value})}
-                  className="w-full bg-gray-700 px-2 py-1 rounded"
+                  className="w-full bg-gruvbox-bg2 px-2 py-1 rounded"
                 />
               </div>
             </div>
@@ -2856,7 +2856,7 @@ export default function App() {
               <select
                 value={canvasSettings.bgType || 'solid'}
                 onChange={(e) => setCanvasSettings({...canvasSettings, bgType: e.target.value})}
-                className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                className="w-full bg-gruvbox-bg2 px-2 py-1 rounded text-sm"
               >
                 <option value="solid">Solid Color</option>
                 <option value="gradient">Gradient</option>
@@ -2870,7 +2870,7 @@ export default function App() {
                   type="color"
                   value={canvasSettings.bgColor}
                   onChange={(e) => setCanvasSettings({...canvasSettings, bgColor: e.target.value})}
-                  className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                  className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                 />
               </div>
             ) : (
@@ -2881,7 +2881,7 @@ export default function App() {
                     type="color"
                     value={canvasSettings.bgGradientStart || canvasSettings.bgColor}
                     onChange={(e) => setCanvasSettings({...canvasSettings, bgGradientStart: e.target.value})}
-                    className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                    className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                   />
                 </div>
                 <div>
@@ -2890,7 +2890,7 @@ export default function App() {
                     type="color"
                     value={canvasSettings.bgGradientEnd || '#ffffff'}
                     onChange={(e) => setCanvasSettings({...canvasSettings, bgGradientEnd: e.target.value})}
-                    className="w-full h-8 bg-gray-700 rounded cursor-pointer"
+                    className="w-full h-8 bg-gruvbox-bg2 rounded cursor-pointer"
                   />
                 </div>
                 <div>
@@ -2898,7 +2898,7 @@ export default function App() {
                     <label className="text-sm">Gradient Angle: {canvasSettings.bgGradientAngle || 0}°</label>
                     <button
                       onClick={() => setCanvasSettings({...canvasSettings, bgGradientAngle: 0})}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                       title="Reset Gradient Angle"
                     >
                       <RotateCcw size={14} />
@@ -2922,13 +2922,13 @@ export default function App() {
                 <div className="space-y-2">
                   <button
                     onClick={removeBackgroundImage}
-                    className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-sm"
+                    className="w-full px-3 py-2 bg-gruvbox-red hover:bg-gruvbox-red/80 rounded text-sm"
                   >
                     Remove Background Image
                   </button>
                 </div>
               ) : (
-                <label className="flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded cursor-pointer text-sm">
+                <label className="flex items-center justify-center gap-2 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 px-3 py-2 rounded cursor-pointer text-sm">
                   <ImagePlus size={16} />
                   Upload Image
                   <input type="file" accept="image/*" onChange={uploadBackgroundImage} className="hidden" />
@@ -2941,7 +2941,7 @@ export default function App() {
                 <label className="text-sm">Background Blur: {canvasSettings.bgBlur}px</label>
                 <button
                   onClick={() => setCanvasSettings({...canvasSettings, bgBlur: 0})}
-                  className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                  className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                   title="Reset Background Blur"
                 >
                   <RotateCcw size={14} />
@@ -2960,7 +2960,7 @@ export default function App() {
             {/* Background Image Filters - Only show if background image exists */}
             {canvasSettings.bgImage && (
               <>
-                <div className="border-t border-gray-700 pt-3 mt-3">
+                <div className="border-t border-gruvbox-bg3 pt-3 mt-3">
                   <label className="block text-sm mb-2 font-semibold">Background Image Adjustments</label>
                 </div>
 
@@ -2969,7 +2969,7 @@ export default function App() {
                     <label className="text-sm">Brightness: {canvasSettings.bgBrightness}%</label>
                     <button
                       onClick={() => setCanvasSettings({...canvasSettings, bgBrightness: 100})}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                       title="Reset Brightness"
                     >
                       <RotateCcw size={14} />
@@ -2990,7 +2990,7 @@ export default function App() {
                     <label className="text-sm">Contrast: {canvasSettings.bgContrast}%</label>
                     <button
                       onClick={() => setCanvasSettings({...canvasSettings, bgContrast: 100})}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                       title="Reset Contrast"
                     >
                       <RotateCcw size={14} />
@@ -3011,7 +3011,7 @@ export default function App() {
                     <label className="text-sm">Saturation: {canvasSettings.bgSaturation}%</label>
                     <button
                       onClick={() => setCanvasSettings({...canvasSettings, bgSaturation: 100})}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                       title="Reset Saturation"
                     >
                       <RotateCcw size={14} />
@@ -3032,7 +3032,7 @@ export default function App() {
                     <label className="text-sm">Hue: {canvasSettings.bgHue}°</label>
                     <button
                       onClick={() => setCanvasSettings({...canvasSettings, bgHue: 0})}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                       title="Reset Hue"
                     >
                       <RotateCcw size={14} />
@@ -3053,7 +3053,7 @@ export default function App() {
                   <select
                     value={canvasSettings.bgFilter}
                     onChange={(e) => setCanvasSettings({...canvasSettings, bgFilter: e.target.value})}
-                    className="w-full bg-gray-700 px-2 py-1 rounded text-sm"
+                    className="w-full bg-gruvbox-bg2 px-2 py-1 rounded text-sm"
                   >
                     {Object.entries(IMAGE_FILTERS).map(([value, label]) => (
                       <option key={value} value={value}>{label}</option>
@@ -3079,7 +3079,7 @@ export default function App() {
                       <label className="text-xs">Grid Size: {canvasSettings.gridSize}px</label>
                       <button
                         onClick={() => setCanvasSettings({...canvasSettings, gridSize: 20})}
-                        className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                        className="p-1 bg-gruvbox-bg2 hover:bg-gruvbox-bg3 rounded"
                         title="Reset Grid Size"
                       >
                         <RotateCcw size={12} />
@@ -3101,21 +3101,21 @@ export default function App() {
                       type="color"
                       value={canvasSettings.gridColor || '#444444'}
                       onChange={(e) => setCanvasSettings({...canvasSettings, gridColor: e.target.value})}
-                      className="w-full h-6 bg-gray-700 rounded cursor-pointer"
+                      className="w-full h-6 bg-gruvbox-bg2 rounded cursor-pointer"
                     />
                   </div>
                 </>
               )}
             </div>
 
-            <div className="border-t border-gray-700 pt-3 mt-3">
+            <div className="border-t border-gruvbox-bg3 pt-3 mt-3">
               <button
                 onClick={clearAll}
-                className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+                className="w-full px-3 py-2 bg-gruvbox-red hover:bg-gruvbox-red/80 rounded text-sm font-medium"
               >
                 Clear All
               </button>
-              <p className="text-xs text-gray-500 mt-1 text-center">Remove all layers and reset canvas</p>
+              <p className="text-xs text-gruvbox-fg4 mt-1 text-center">Remove all layers and reset canvas</p>
             </div>
           </div>
         </div>
