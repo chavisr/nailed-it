@@ -64,6 +64,7 @@ export default function App() {
   const [cropDragging, setCropDragging] = useState(false);
   const [cropResizing, setCropResizing] = useState(null);
   const [manualGuides, setManualGuides] = useState({ vertical: [], horizontal: [] });
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null);
 
   // Load Google Fonts on mount
   useEffect(() => {
@@ -155,15 +156,13 @@ export default function App() {
                        e.target.tagName === 'TEXTAREA' || 
                        e.target.isContentEditable;
       
-      if (e.key === 'Delete' && !cropMode && !isTyping) {
+      if (e.key === 'Delete' && !cropMode && !isTyping && !deleteConfirmation) {
         if (selectedLayers.length > 0) {
-          // Delete all selected layers
-          const newLayers = layers.filter(l => !selectedLayers.includes(l.id));
-          setLayers(newLayers);
-          setSelectedLayers([]);
-          setSelectedLayer(null);
+          // Show delete confirmation for multiple layers
+          setDeleteConfirmation({ type: 'multiple', ids: selectedLayers });
         } else if (selectedLayer) {
-          deleteLayer(selectedLayer);
+          // Show delete confirmation for single layer
+          setDeleteConfirmation({ type: 'single', ids: [selectedLayer] });
         }
       }
       
@@ -227,16 +226,20 @@ export default function App() {
         setSelectedLayer(null); // Clear single selection when multi-selecting
       }
       
-      // Escape key to deselect all
+      // Escape key to cancel delete confirmation or deselect all
       if (e.key === 'Escape' && !isTyping) {
-        setSelectedLayers([]);
-        setSelectedLayer(null);
+        if (deleteConfirmation) {
+          cancelDelete();
+        } else {
+          setSelectedLayers([]);
+          setSelectedLayer(null);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedLayer, selectedLayers, copiedLayer, layers, cropMode]);
+  }, [selectedLayer, selectedLayers, copiedLayer, layers, cropMode, deleteConfirmation]);
 
   const applyImageAdjustments = (ctx, layer) => {
     if (layer.type !== 'image') return;
@@ -745,10 +748,20 @@ export default function App() {
     setLayers(newLayers);
   };
 
-  const deleteLayer = (id) => {
-    const newLayers = layers.filter(l => l.id !== id);
+  const confirmDeleteLayer = (id) => {
+    setDeleteConfirmation({ type: 'single', ids: [id] });
+  };
+
+  const deleteLayer = (ids) => {
+    const newLayers = layers.filter(l => !ids.includes(l.id));
     setLayers(newLayers);
-    if (selectedLayer === id) setSelectedLayer(null);
+    if (ids.includes(selectedLayer)) setSelectedLayer(null);
+    setSelectedLayers(prevSelected => prevSelected.filter(id => !ids.includes(id)));
+    setDeleteConfirmation(null);
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirmation(null);
   };
 
   const toggleVisibility = (id) => {
@@ -1852,7 +1865,7 @@ export default function App() {
                   <span className="flex-1 text-sm truncate">
                     {layer.type === 'text' ? layer.text : `Image ${layer.id}`}
                   </span>
-                  <button onClick={(e) => { e.stopPropagation(); deleteLayer(layer.id); }}>
+                  <button onClick={(e) => { e.stopPropagation(); confirmDeleteLayer(layer.id); }}>
                     <Trash2 size={16} className="text-red-400" />
                   </button>
                 </div>
@@ -1972,6 +1985,28 @@ export default function App() {
               <button
                 onClick={cancelCrop}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+              >
+                <X size={18} />
+                Cancel
+              </button>
+            </div>
+          )}
+          
+          {deleteConfirmation && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-400 mr-2">
+                Delete {deleteConfirmation.ids.length} layer{deleteConfirmation.ids.length > 1 ? 's' : ''}?
+              </span>
+              <button
+                onClick={() => deleteLayer(deleteConfirmation.ids)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+              >
+                <Check size={18} />
+                Confirm Delete
+              </button>
+              <button
+                onClick={cancelDelete}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-sm font-medium"
               >
                 <X size={18} />
                 Cancel
