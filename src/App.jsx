@@ -2305,6 +2305,7 @@ export default function App() {
                   <option value="'Roboto Condensed', sans-serif">Roboto Condensed</option>
                   <option value="'Luckiest Guy', sans-serif">Luckiest Guy</option>
                   <option value="'Permanent Marker', cursive">Permanent Marker</option>
+                  <option value="'Sarabun', sans-serif">Sarabun (Thai)</option>
                   <option value="'Arial Black', sans-serif">Arial Black</option>
                 </select>
               </div>
