@@ -1543,7 +1543,7 @@ export default function App() {
     if (!selectedLayer) return;
     const layer = layers.find(l => l.id === selectedLayer);
     if (layer) {
-      updateLayer(selectedLayer, { rotation: (layer.rotation + 15) % 360 });
+      updateLayer(selectedLayer, { rotation: (layer.rotation + 90) % 360 });
     }
   };
 
@@ -2096,6 +2096,13 @@ export default function App() {
                     <FlipVertical size={16} />
                     Flip V
                   </button>
+                  <button
+                    onClick={rotateLayer}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+                  >
+                    <RotateCw size={16} />
+                    Rotate 90°
+                  </button>
                 </div>
                 
                 {!cropMode && (
@@ -2225,13 +2232,6 @@ export default function App() {
                   onChange={(e) => updateLayer(selectedLayer, { rotation: +e.target.value })}
                   className="w-full"
                 />
-                <button
-                  onClick={rotateLayer}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm mt-2"
-                >
-                  <RotateCw size={16} />
-                  Rotate 90°
-                </button>
               </div>
             </>
           )}
@@ -2424,13 +2424,6 @@ export default function App() {
                   onChange={(e) => updateLayer(selectedLayer, { rotation: +e.target.value })}
                   className="w-full"
                 />
-                <button
-                  onClick={rotateLayer}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm mt-2"
-                >
-                  <RotateCw size={16} />
-                  Rotate 90°
-                </button>
               </div>
             </>
           )}
