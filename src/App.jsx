@@ -2212,10 +2212,10 @@ export default function App() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={rotateLayer}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
                       title="Rotate 90°"
                     >
-                      <RotateCw size={14} />
+                      90°
                     </button>
                     <button
                       onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
@@ -2413,10 +2413,10 @@ export default function App() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={rotateLayer}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
                       title="Rotate 90°"
                     >
-                      <RotateCw size={14} />
+                      90°
                     </button>
                     <button
                       onClick={() => updateLayer(selectedLayer, { rotation: 0 })}
