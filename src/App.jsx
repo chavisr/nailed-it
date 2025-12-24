@@ -427,6 +427,20 @@ export default function App() {
         ctx.rotate((layer.rotation || 0) * Math.PI / 180);
         ctx.scale(layer.flipH ? -1 : 1, layer.flipV ? -1 : 1);
         
+        // Apply 3D depth effect (perspective scaling)
+        const depth = layer.depth || 0;
+        const rotX = (layer.rotateX || 0) * Math.PI / 180;
+        const rotY = (layer.rotateY || 0) * Math.PI / 180;
+        
+        // Calculate scale based on depth (negative = closer, positive = farther)
+        const depthScale = 1 / (1 + depth / 1000);
+        const scaleX = depthScale * Math.cos(rotY);
+        const scaleY = depthScale * Math.cos(rotX);
+        const skewX = Math.sin(rotY) * 0.5;
+        const skewY = Math.sin(rotX) * 0.5;
+        
+        ctx.transform(scaleX, skewY, skewX, scaleY, 0, 0);
+        
         ctx.drawImage(
           layer.image,
           -layer.width / 2, -layer.height / 2, layer.width, layer.height
@@ -495,6 +509,25 @@ export default function App() {
         if (layer.rotation) {
           ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
           ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+          ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
+        }
+        
+        // Apply 3D depth effect (perspective scaling)
+        const depth = layer.depth || 0;
+        const rotX = (layer.rotateX || 0) * Math.PI / 180;
+        const rotY = (layer.rotateY || 0) * Math.PI / 180;
+        
+        if (depth !== 0 || rotX !== 0 || rotY !== 0) {
+          ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
+          
+          // Calculate scale based on depth (negative = closer, positive = farther)
+          const depthScale = 1 / (1 + depth / 1000);
+          const scaleX = depthScale * Math.cos(rotY);
+          const scaleY = depthScale * Math.cos(rotX);
+          const skewX = Math.sin(rotY) * 0.5;
+          const skewY = Math.sin(rotX) * 0.5;
+          
+          ctx.transform(scaleX, skewY, skewX, scaleY, 0, 0);
           ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
         }
         
@@ -685,7 +718,11 @@ export default function App() {
           contrast: 100,
           saturation: 100,
           hue: 0,
-          filter: 'none'
+          filter: 'none',
+          // 3D depth
+          depth: 0,
+          rotateX: 0,
+          rotateY: 0
         };
         setLayers([...layers, newLayer]);
         setSelectedLayer(newLayer.id);
@@ -721,7 +758,11 @@ export default function App() {
       blur: 0,
       rotation: 0,
       border: { width: 0, color: '#000000' },
-      shadow: { offsetX: 0, offsetY: 0, blur: 0, color: '#000000' }
+      shadow: { offsetX: 0, offsetY: 0, blur: 0, color: '#000000' },
+      // 3D depth
+      depth: 0,
+      rotateX: 0,
+      rotateY: 0
     };
     setLayers([...layers, newLayer]);
     setSelectedLayer(newLayer.id);
@@ -1419,6 +1460,19 @@ export default function App() {
         ctx.rotate((layer.rotation || 0) * Math.PI / 180);
         ctx.scale(layer.flipH ? -1 : 1, layer.flipV ? -1 : 1);
         
+        // Apply 3D depth effect (perspective scaling)
+        const imgDepth = layer.depth || 0;
+        const imgRotX = (layer.rotateX || 0) * Math.PI / 180;
+        const imgRotY = (layer.rotateY || 0) * Math.PI / 180;
+        
+        const imgDepthScale = 1 / (1 + imgDepth / 1000);
+        const imgScaleX = imgDepthScale * Math.cos(imgRotY);
+        const imgScaleY = imgDepthScale * Math.cos(imgRotX);
+        const imgSkewX = Math.sin(imgRotY) * 0.5;
+        const imgSkewY = Math.sin(imgRotX) * 0.5;
+        
+        ctx.transform(imgScaleX, imgSkewY, imgSkewX, imgScaleY, 0, 0);
+        
         ctx.drawImage(
           layer.image,
           -layer.width / 2, -layer.height / 2, layer.width, layer.height
@@ -1471,6 +1525,24 @@ export default function App() {
         if (layer.rotation) {
           ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
           ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+          ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
+        }
+        
+        // Apply 3D depth effect (perspective scaling)
+        const txtDepth = layer.depth || 0;
+        const txtRotX = (layer.rotateX || 0) * Math.PI / 180;
+        const txtRotY = (layer.rotateY || 0) * Math.PI / 180;
+        
+        if (txtDepth !== 0 || txtRotX !== 0 || txtRotY !== 0) {
+          ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
+          
+          const txtDepthScale = 1 / (1 + txtDepth / 1000);
+          const txtScaleX = txtDepthScale * Math.cos(txtRotY);
+          const txtScaleY = txtDepthScale * Math.cos(txtRotX);
+          const txtSkewX = Math.sin(txtRotY) * 0.5;
+          const txtSkewY = Math.sin(txtRotX) * 0.5;
+          
+          ctx.transform(txtScaleX, txtSkewY, txtSkewX, txtScaleY, 0, 0);
           ctx.translate(-(layer.x + layer.width / 2), -(layer.y + layer.height / 2));
         }
         
@@ -2226,6 +2298,51 @@ export default function App() {
                   className="w-full"
                 />
               </div>
+
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-sm">Depth (Z-axis): {selectedLayerData.depth || 0}</label>
+                  <button
+                    onClick={() => updateLayer(selectedLayer, { depth: 0, rotateX: 0, rotateY: 0 })}
+                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    title="Reset 3D"
+                  >
+                    <RotateCcw size={14} />
+                  </button>
+                </div>
+                <input
+                  type="range"
+                  min="-500"
+                  max="500"
+                  value={selectedLayerData.depth || 0}
+                  onChange={(e) => updateLayer(selectedLayer, { depth: +e.target.value })}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm mb-1">Rotate X (tilt): {selectedLayerData.rotateX || 0}°</label>
+                <input
+                  type="range"
+                  min="-60"
+                  max="60"
+                  value={selectedLayerData.rotateX || 0}
+                  onChange={(e) => updateLayer(selectedLayer, { rotateX: +e.target.value })}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm mb-1">Rotate Y (pan): {selectedLayerData.rotateY || 0}°</label>
+                <input
+                  type="range"
+                  min="-60"
+                  max="60"
+                  value={selectedLayerData.rotateY || 0}
+                  onChange={(e) => updateLayer(selectedLayer, { rotateY: +e.target.value })}
+                  className="w-full"
+                />
+              </div>
             </>
           )}
 
@@ -2427,6 +2544,51 @@ export default function App() {
                   max="360"
                   value={selectedLayerData.rotation || 0}
                   onChange={(e) => updateLayer(selectedLayer, { rotation: +e.target.value })}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-sm">Depth (Z-axis): {selectedLayerData.depth || 0}</label>
+                  <button
+                    onClick={() => updateLayer(selectedLayer, { depth: 0, rotateX: 0, rotateY: 0 })}
+                    className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                    title="Reset 3D"
+                  >
+                    <RotateCcw size={14} />
+                  </button>
+                </div>
+                <input
+                  type="range"
+                  min="-500"
+                  max="500"
+                  value={selectedLayerData.depth || 0}
+                  onChange={(e) => updateLayer(selectedLayer, { depth: +e.target.value })}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm mb-1">Rotate X (tilt): {selectedLayerData.rotateX || 0}°</label>
+                <input
+                  type="range"
+                  min="-60"
+                  max="60"
+                  value={selectedLayerData.rotateX || 0}
+                  onChange={(e) => updateLayer(selectedLayer, { rotateX: +e.target.value })}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm mb-1">Rotate Y (pan): {selectedLayerData.rotateY || 0}°</label>
+                <input
+                  type="range"
+                  min="-60"
+                  max="60"
+                  value={selectedLayerData.rotateY || 0}
+                  onChange={(e) => updateLayer(selectedLayer, { rotateY: +e.target.value })}
                   className="w-full"
                 />
               </div>
