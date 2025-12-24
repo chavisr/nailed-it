@@ -1871,7 +1871,15 @@ export default function App() {
                   <span className="flex-1 text-sm truncate">
                     {layer.type === 'text' ? layer.text : `Image ${layer.id}`}
                   </span>
-                  <button onClick={(e) => { e.stopPropagation(); confirmDeleteLayer(layer.id); }}>
+                  <button onClick={(e) => { 
+                    e.stopPropagation(); 
+                    // If this layer is part of a multi-selection, delete all selected layers
+                    if (selectedLayers.includes(layer.id) && selectedLayers.length > 0) {
+                      setDeleteConfirmation({ type: 'multiple', ids: selectedLayers });
+                    } else {
+                      confirmDeleteLayer(layer.id);
+                    }
+                  }}>
                     <Trash2 size={16} className="text-red-400" />
                   </button>
                 </div>
