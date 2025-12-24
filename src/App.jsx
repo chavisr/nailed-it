@@ -2324,22 +2324,18 @@ export default function App() {
               {/* Transform */}
               <div className="mb-4 pb-4 border-b border-gray-700">
                 <h3 className="text-sm font-semibold text-gray-400 mb-2">3D ROTATION</h3>
-                
-                <div className="mb-2">
+
+                <div className="mb-3">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-sm">3D Rotation</label>
+                    <label className="text-sm">X-axis (Tilt): {selectedLayerData.rotateX || 0}°</label>
                     <button
-                      onClick={() => updateLayer(selectedLayer, { rotateX: 0, rotateY: 0, rotateZ: 0 })}
+                      onClick={() => updateLayer(selectedLayer, { rotateX: 0 })}
                       className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
-                      title="Reset All Rotations"
+                      title="Reset X-axis"
                     >
                       <RotateCcw size={14} />
                     </button>
                   </div>
-                </div>
-
-                <div className="mb-3">
-                  <label className="block text-sm mb-1">X-axis (Tilt): {selectedLayerData.rotateX || 0}°</label>
                   <input
                     type="range"
                     min="-180"
@@ -2351,7 +2347,16 @@ export default function App() {
                 </div>
 
                 <div className="mb-3">
-                  <label className="block text-sm mb-1">Y-axis (Pan): {selectedLayerData.rotateY || 0}°</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm">Y-axis (Pan): {selectedLayerData.rotateY || 0}°</label>
+                    <button
+                      onClick={() => updateLayer(selectedLayer, { rotateY: 0 })}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset Y-axis"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
                   <input
                     type="range"
                     min="-180"
@@ -2365,13 +2370,22 @@ export default function App() {
                 <div className="mb-0">
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm">Z-axis (Rotation): {selectedLayerData.rotateZ || 0}°</label>
-                    <button
-                      onClick={() => updateLayer(selectedLayer, { rotateZ: (selectedLayerData.rotateZ || 0) + 90 })}
-                      className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
-                      title="Rotate 90°"
-                    >
-                      90°
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => updateLayer(selectedLayer, { rotateZ: ((selectedLayerData.rotateZ || 0) + 90) % 360 })}
+                        className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
+                        title="Rotate 90°"
+                      >
+                        90°
+                      </button>
+                      <button
+                        onClick={() => updateLayer(selectedLayer, { rotateZ: 0 })}
+                        className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                        title="Reset Z-axis"
+                      >
+                        <RotateCcw size={14} />
+                      </button>
+                    </div>
                   </div>
                   <input
                     type="range"
@@ -2576,22 +2590,18 @@ export default function App() {
               {/* Transform */}
               <div className="mb-4 pb-4 border-b border-gray-700">
                 <h3 className="text-sm font-semibold text-gray-400 mb-2">3D ROTATION</h3>
-                
-                <div className="mb-2">
+
+                <div className="mb-3">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-sm">3D Rotation</label>
+                    <label className="text-sm">X-axis (Tilt): {selectedLayerData.rotateX || 0}°</label>
                     <button
-                      onClick={() => updateLayer(selectedLayer, { rotateX: 0, rotateY: 0, rotateZ: 0 })}
+                      onClick={() => updateLayer(selectedLayer, { rotateX: 0 })}
                       className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
-                      title="Reset All Rotations"
+                      title="Reset X-axis"
                     >
                       <RotateCcw size={14} />
                     </button>
                   </div>
-                </div>
-
-                <div className="mb-3">
-                  <label className="block text-sm mb-1">X-axis (Tilt): {selectedLayerData.rotateX || 0}°</label>
                   <input
                     type="range"
                     min="-180"
@@ -2603,7 +2613,16 @@ export default function App() {
                 </div>
 
                 <div className="mb-3">
-                  <label className="block text-sm mb-1">Y-axis (Pan): {selectedLayerData.rotateY || 0}°</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm">Y-axis (Pan): {selectedLayerData.rotateY || 0}°</label>
+                    <button
+                      onClick={() => updateLayer(selectedLayer, { rotateY: 0 })}
+                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                      title="Reset Y-axis"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
                   <input
                     type="range"
                     min="-180"
@@ -2617,13 +2636,22 @@ export default function App() {
                 <div className="mb-0">
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm">Z-axis (Rotation): {selectedLayerData.rotateZ || 0}°</label>
-                    <button
-                      onClick={() => updateLayer(selectedLayer, { rotateZ: (selectedLayerData.rotateZ || 0) + 90 })}
-                      className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
-                      title="Rotate 90°"
-                    >
-                      90°
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => updateLayer(selectedLayer, { rotateZ: ((selectedLayerData.rotateZ || 0) + 90) % 360 })}
+                        className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold"
+                        title="Rotate 90°"
+                      >
+                        90°
+                      </button>
+                      <button
+                        onClick={() => updateLayer(selectedLayer, { rotateZ: 0 })}
+                        className="p-1 bg-gray-700 hover:bg-gray-600 rounded"
+                        title="Reset Z-axis"
+                      >
+                        <RotateCcw size={14} />
+                      </button>
+                    </div>
                   </div>
                   <input
                     type="range"
