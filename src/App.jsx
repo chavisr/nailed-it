@@ -55,7 +55,6 @@ export default function App() {
   const [resizing, setResizing] = useState(null);
   const [guides, setGuides] = useState({ x: [], y: [] });
   const [dragOverIndex, setDragOverIndex] = useState(null);
-  const [copiedLayer, setCopiedLayer] = useState(null);
   const [cropMode, setCropMode] = useState(null);
   const [cropBox, setCropBox] = useState(null);
   const [cropDragging, setCropDragging] = useState(false);
@@ -288,24 +287,20 @@ export default function App() {
         }
       }
       
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedLayer && !cropMode && !deleteConfirmation && !isTyping && selectedLayers.length === 0) {
+      // Ctrl+D to duplicate selected layer
+      if ((e.ctrlKey || e.metaKey) && e.key === 'd' && selectedLayer && !cropMode && !deleteConfirmation && !isTyping && selectedLayers.length === 0) {
         e.preventDefault();
-        const layerToCopy = layers.find(l => l.id === selectedLayer);
-        if (layerToCopy) {
-          setCopiedLayer(layerToCopy);
+        const layerToDuplicate = layers.find(l => l.id === selectedLayer);
+        if (layerToDuplicate) {
+          const newLayer = {
+            ...layerToDuplicate,
+            id: Date.now(),
+            x: layerToDuplicate.x + 20,
+            y: layerToDuplicate.y + 20
+          };
+          setLayers([...layers, newLayer]);
+          setSelectedLayer(newLayer.id);
         }
-      }
-      
-      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && copiedLayer && !cropMode && !deleteConfirmation && !isTyping && selectedLayers.length === 0) {
-        e.preventDefault();
-        const newLayer = {
-          ...copiedLayer,
-          id: Date.now(),
-          x: copiedLayer.x + 20,
-          y: copiedLayer.y + 20
-        };
-        setLayers([...layers, newLayer]);
-        setSelectedLayer(newLayer.id);
       }
       
       // Only move layers with arrow keys if NOT typing in a text field
@@ -361,7 +356,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedLayer, selectedLayers, copiedLayer, layers, cropMode, deleteConfirmation]);
+  }, [selectedLayer, selectedLayers, layers, cropMode, deleteConfirmation]);
 
   const applyImageAdjustments = (ctx, layer) => {
     if (layer.type !== 'image') return;
