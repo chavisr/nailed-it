@@ -911,11 +911,13 @@ export default function App() {
     const isCtrlPressed = e.ctrlKey || e.metaKey;
 
     if (clickedLayer) {
-      // Multi-selection with Ctrl/Cmd
-      if (isCtrlPressed) {
+      // Multi-selection mode: if already in multi-select OR Ctrl is pressed
+      if (selectedLayers.length > 0 || isCtrlPressed) {
         if (selectedLayers.includes(clickedLayer.id)) {
           // Deselect if already selected in multi-selection
           setSelectedLayers(selectedLayers.filter(id => id !== clickedLayer.id));
+          setSelectedLayer(null);
+          return;
         } else {
           // Add to selection
           // If there's a currently selected single layer, include it
@@ -925,22 +927,9 @@ export default function App() {
           }
           newSelection.push(clickedLayer.id);
           setSelectedLayers(newSelection);
+          setSelectedLayer(null);
+          return;
         }
-        setSelectedLayer(null);
-        return;
-      }
-      
-      // Check if clicking on already selected layer in multi-selection
-      if (selectedLayers.length > 0 && selectedLayers.includes(clickedLayer.id)) {
-        // Start dragging the group - store absolute mouse position
-        setIsDragging(true);
-        setDragStart({ x: x, y: y });
-        return;
-      }
-      
-      // Clear multi-selection if clicking on non-selected layer
-      if (selectedLayers.length > 0) {
-        setSelectedLayers([]);
       }
       
       setSelectedLayer(clickedLayer.id);
