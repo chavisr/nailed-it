@@ -25,7 +25,7 @@ const DEFAULT_CANVAS = {
   showGrid: false,
   gridSize: 20,
   gridColor: '#7D7D7D',
-  workspaceColor: '#374151', // gray-700
+  workspaceColor: '#2E3848', // RGB(46, 56, 72)
   // Background image adjustments
   bgBrightness: 100,
   bgContrast: 100,
@@ -1970,7 +1970,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col" style={{ backgroundColor: canvasSettings.workspaceColor || '#374151' }}>
+      <div className="flex-1 flex flex-col" style={{ backgroundColor: canvasSettings.workspaceColor || '#2E3848' }}>
         <div className="p-4 bg-gray-800 flex items-center gap-4 border-b border-gray-700" onMouseDown={(e) => {
           if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
             setSelectedLayer(null);
