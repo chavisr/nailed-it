@@ -438,16 +438,36 @@ export default function App() {
         
         ctx.transform(scaleX, skewY, skewX, scaleY, 0, 0);
         
+        // Draw border first if needed (using image alpha as mask)
+        if (layer.border.width > 0) {
+          // Create a temporary canvas for border effect
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = layer.width + layer.border.width * 4;
+          tempCanvas.height = layer.height + layer.border.width * 4;
+          const tempCtx = tempCanvas.getContext('2d');
+          
+          const offset = layer.border.width * 2;
+          
+          // Draw the image multiple times offset to create outline
+          for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+            const xOff = Math.cos(angle) * layer.border.width;
+            const yOff = Math.sin(angle) * layer.border.width;
+            tempCtx.drawImage(layer.image, offset + xOff, offset + yOff, layer.width, layer.height);
+          }
+          
+          // Set composite mode to only draw where there's image pixels
+          tempCtx.globalCompositeOperation = 'source-in';
+          tempCtx.fillStyle = layer.border.color;
+          tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+          
+          // Draw the border from temp canvas
+          ctx.drawImage(tempCanvas, -layer.width / 2 - offset, -layer.height / 2 - offset);
+        }
+        
         ctx.drawImage(
           layer.image,
           -layer.width / 2, -layer.height / 2, layer.width, layer.height
         );
-        
-        if (layer.border.width > 0) {
-          ctx.strokeStyle = layer.border.color;
-          ctx.lineWidth = layer.border.width;
-          ctx.strokeRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
-        }
         
         ctx.setTransform(1, 0, 0, 1, 0, 0);
       } else if (layer.type === 'text') {
@@ -1463,16 +1483,36 @@ export default function App() {
         
         ctx.transform(imgScaleX, imgSkewY, imgSkewX, imgScaleY, 0, 0);
         
+        // Draw border first if needed (using image alpha as mask)
+        if (layer.border.width > 0) {
+          // Create a temporary canvas for border effect
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = layer.width + layer.border.width * 4;
+          tempCanvas.height = layer.height + layer.border.width * 4;
+          const tempCtx = tempCanvas.getContext('2d');
+          
+          const offset = layer.border.width * 2;
+          
+          // Draw the image multiple times offset to create outline
+          for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+            const xOff = Math.cos(angle) * layer.border.width;
+            const yOff = Math.sin(angle) * layer.border.width;
+            tempCtx.drawImage(layer.image, offset + xOff, offset + yOff, layer.width, layer.height);
+          }
+          
+          // Set composite mode to only draw where there's image pixels
+          tempCtx.globalCompositeOperation = 'source-in';
+          tempCtx.fillStyle = layer.border.color;
+          tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+          
+          // Draw the border from temp canvas
+          ctx.drawImage(tempCanvas, -layer.width / 2 - offset, -layer.height / 2 - offset);
+        }
+        
         ctx.drawImage(
           layer.image,
           -layer.width / 2, -layer.height / 2, layer.width, layer.height
         );
-        
-        if (layer.border.width > 0) {
-          ctx.strokeStyle = layer.border.color;
-          ctx.lineWidth = layer.border.width;
-          ctx.strokeRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
-        }
         
         ctx.setTransform(1, 0, 0, 1, 0, 0);
       } else if (layer.type === 'text') {
