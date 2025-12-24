@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, Trash2, ImagePlus, Type, Download, ZoomIn, ZoomOut, FlipHorizontal, FlipVertical, RotateCw, ArrowRightLeft, Crop, Check, X, Settings, ClipboardPaste, RotateCcw, Github } from 'lucide-react';
+import { Eye, EyeOff, Trash2, ImagePlus, Type, Download, ZoomIn, ZoomOut, FlipHorizontal, FlipVertical, RotateCw, ArrowRightLeft, Crop, Check, X, Settings, RotateCcw, Github } from 'lucide-react';
 
 // Load Google Fonts
 const loadGoogleFonts = () => {
@@ -145,6 +145,131 @@ export default function App() {
       console.error('Failed to save state:', error);
     }
   }, [layers, canvasSettings]);
+
+  // Auto-detect clipboard content on paste
+  useEffect(() => {
+    const handlePaste = async (e) => {
+      // Check if user is typing in an input or textarea
+      const isTyping = e.target.tagName === 'INPUT' || 
+                       e.target.tagName === 'TEXTAREA' || 
+                       e.target.isContentEditable;
+      
+      if (isTyping || cropMode || deleteConfirmation) return;
+      
+      e.preventDefault();
+      
+      try {
+        const clipboardItems = await navigator.clipboard.read();
+        
+        for (const clipboardItem of clipboardItems) {
+          // Check for image
+          for (const type of clipboardItem.types) {
+            if (type.startsWith('image/')) {
+              const blob = await clipboardItem.getType(type);
+              const reader = new FileReader();
+              
+              reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                  const maxSize = 500;
+                  const aspectRatio = img.width / img.height;
+                  let displayWidth = img.width;
+                  let displayHeight = img.height;
+
+                  if (img.width > maxSize || img.height > maxSize) {
+                    if (aspectRatio > 1) {
+                      displayWidth = maxSize;
+                      displayHeight = maxSize / aspectRatio;
+                    } else {
+                      displayHeight = maxSize;
+                      displayWidth = maxSize * aspectRatio;
+                    }
+                  }
+
+                  const newLayer = {
+                    id: Date.now(),
+                    type: 'image',
+                    x: 100,
+                    y: 100,
+                    width: displayWidth,
+                    height: displayHeight,
+                    aspectRatio: aspectRatio,
+                    originalWidth: img.width,
+                    originalHeight: img.height,
+                    image: img,
+                    visible: true,
+                    opacity: 1,
+                    blur: 0,
+                    rotateX: 0,
+                    rotateY: 0,
+                    rotateZ: 0,
+                    flipH: false,
+                    flipV: false,
+                    border: { width: 0, color: '#ffffff' },
+                    shadow: { offsetX: 0, offsetY: 0, blur: 0, color: '#000000' },
+                    brightness: 100,
+                    contrast: 100,
+                    saturation: 100,
+                    hue: 0,
+                    filter: 'none'
+                  };
+                  setLayers(prev => [...prev, newLayer]);
+                  setSelectedLayer(newLayer.id);
+                };
+                img.src = event.target.result;
+              };
+              reader.readAsDataURL(blob);
+              return;
+            }
+          }
+          
+          // Check for text
+          if (clipboardItem.types.includes('text/plain')) {
+            const blob = await clipboardItem.getType('text/plain');
+            const text = await blob.text();
+            
+            const newLayer = {
+              id: Date.now(),
+              type: 'text',
+              text: text,
+              x: 100,
+              y: 100,
+              width: 200,
+              height: 50,
+              fontSize: 48,
+              fontFamily: "Impact, 'Arial Black', sans-serif",
+              color: '#ffffff',
+              bold: false,
+              italic: false,
+              underline: false,
+              strokeWidth: 0,
+              strokeColor: '#000000',
+              textEffect: 'none',
+              gradientStart: '#ffffff',
+              gradientEnd: '#ff0000',
+              gradientAngle: 0,
+              visible: true,
+              opacity: 1,
+              blur: 0,
+              rotateX: 0,
+              rotateY: 0,
+              rotateZ: 0,
+              border: { width: 0, color: '#000000' },
+              shadow: { offsetX: 0, offsetY: 0, blur: 0, color: '#000000' }
+            };
+            setLayers(prev => [...prev, newLayer]);
+            setSelectedLayer(newLayer.id);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to read clipboard:', err);
+      }
+    };
+    
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [layers, cropMode, deleteConfirmation]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -814,106 +939,7 @@ export default function App() {
     setLayers(newLayers);
   };
 
-  const pasteFromClipboard = async () => {
-    try {
-      const clipboardItems = await navigator.clipboard.read();
-      
-      for (const clipboardItem of clipboardItems) {
-        // Check for image
-        for (const type of clipboardItem.types) {
-          if (type.startsWith('image/')) {
-            const blob = await clipboardItem.getType(type);
-            const reader = new FileReader();
-            
-            reader.onload = (event) => {
-              const img = new Image();
-              img.onload = () => {
-                const maxSize = 500;
-                const aspectRatio = img.width / img.height;
-                let displayWidth = img.width;
-                let displayHeight = img.height;
 
-                if (img.width > maxSize || img.height > maxSize) {
-                  if (aspectRatio > 1) {
-                    displayWidth = maxSize;
-                    displayHeight = maxSize / aspectRatio;
-                  } else {
-                    displayHeight = maxSize;
-                    displayWidth = maxSize * aspectRatio;
-                  }
-                }
-
-                const newLayer = {
-                  id: Date.now(),
-                  type: 'image',
-                  x: 100,
-                  y: 100,
-                  width: displayWidth,
-                  height: displayHeight,
-                  aspectRatio: aspectRatio,
-                  originalWidth: img.width,
-                  originalHeight: img.height,
-                  image: img,
-                  visible: true,
-                  opacity: 1,
-                  blur: 0,
-                  rotation: 0,
-                  flipH: false,
-                  flipV: false,
-                  border: { width: 0, color: '#ffffff' },
-                  shadow: { offsetX: 0, offsetY: 0, blur: 0, color: '#000000' },
-                  brightness: 100,
-                  contrast: 100,
-                  saturation: 100,
-                  hue: 0,
-                  filter: 'none'
-                };
-                setLayers([...layers, newLayer]);
-                setSelectedLayer(newLayer.id);
-              };
-              img.src = event.target.result;
-            };
-            reader.readAsDataURL(blob);
-            return;
-          }
-        }
-        
-        // Check for text
-        if (clipboardItem.types.includes('text/plain')) {
-          const blob = await clipboardItem.getType('text/plain');
-          const text = await blob.text();
-          
-          const newLayer = {
-            id: Date.now(),
-            type: 'text',
-            text: text,
-            x: 100,
-            y: 100,
-            width: 200,
-            height: 50,
-            fontSize: 48,
-            fontFamily: "Impact, 'Arial Black', sans-serif",
-            color: '#ffffff',
-            bold: false,
-            italic: false,
-            underline: false,
-            visible: true,
-            opacity: 1,
-            blur: 0,
-            rotation: 0,
-            border: { width: 0, color: '#000000' },
-            shadow: { offsetX: 0, offsetY: 0, blur: 0, color: '#000000' }
-          };
-          setLayers([...layers, newLayer]);
-          setSelectedLayer(newLayer.id);
-          return;
-        }
-      }
-    } catch (err) {
-      console.error('Failed to read clipboard:', err);
-      alert('Failed to paste from clipboard. Please make sure you have granted clipboard permissions.');
-    }
-  };
 
   const handleCanvasMouseDown = (e) => {
     if (deleteConfirmation) return;
@@ -2008,13 +2034,6 @@ export default function App() {
           <div className="h-6 w-px bg-gray-600"></div>
 
           <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
-            <button
-              onClick={pasteFromClipboard}
-              className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded text-sm"
-              title="Paste from Clipboard"
-            >
-              <ClipboardPaste size={18} />
-            </button>
             <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded cursor-pointer text-sm"
               title="Add Image">
               <ImagePlus size={18} />
