@@ -1,9 +1,46 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FlipHorizontal, FlipVertical, RotateCw, ArrowRightLeft, Crop, Settings, RotateCcw, ImagePlus } from 'lucide-react';
-import { DEFAULT_CANVAS, IMAGE_FILTERS } from './constants';
-import { loadGoogleFonts } from './utils/fonts';
-import LayersPanel from './components/LayersPanel';
-import Toolbar from './components/Toolbar';
+import { Eye, EyeOff, Trash2, ImagePlus, Type, Download, ZoomIn, ZoomOut, FlipHorizontal, FlipVertical, RotateCw, ArrowRightLeft, Crop, Check, X, Settings, RotateCcw, Github } from 'lucide-react';
+
+// Load Google Fonts
+const loadGoogleFonts = () => {
+  const link = document.createElement('link');
+  link.href = 'https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@400;700&family=Montserrat:wght@400;700&family=League+Spartan:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Luckiest+Guy&family=Permanent+Marker&display=swap';
+  link.rel = 'stylesheet';
+  if (!document.querySelector(`link[href="${link.href}"]`)) {
+    document.head.appendChild(link);
+  }
+};
+
+const DEFAULT_CANVAS = { 
+  width: 1280, 
+  height: 720, 
+  bgColor: '#000000', 
+  bgType: 'solid',
+  bgGradientStart: '#000000',
+  bgGradientEnd: '#4a4a4a',
+  bgGradientAngle: 45,
+  bgImage: null, 
+  bgOpacity: 1, 
+  bgBlur: 0,
+  showGrid: false,
+  gridSize: 20,
+  gridColor: '#7D7D7D',
+  workspaceColor: '#2E3848', // RGB(46, 56, 72)
+  // Background image adjustments
+  bgBrightness: 100,
+  bgContrast: 100,
+  bgSaturation: 100,
+  bgHue: 0,
+  bgFilter: 'none'
+};
+
+const IMAGE_FILTERS = {
+  none: 'None',
+  grayscale: 'Grayscale',
+  sepia: 'Sepia',
+  invert: 'Invert',
+  vintage: 'Vintage'
+};
 
 export default function App() {
   const [canvasSettings, setCanvasSettings] = useState(DEFAULT_CANVAS);
@@ -22,7 +59,7 @@ export default function App() {
   const [cropBox, setCropBox] = useState(null);
   const [cropDragging, setCropDragging] = useState(false);
   const [cropResizing, setCropResizing] = useState(null);
-  const [manualGuides, _SetManualGuides] = useState({ vertical: [], horizontal: [] });
+  const [manualGuides, setManualGuides] = useState({ vertical: [], horizontal: [] });
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
 
   // Load Google Fonts on mount
@@ -867,6 +904,10 @@ export default function App() {
   const updateLayer = (id, updates) => {
     const newLayers = layers.map(l => l.id === id ? { ...l, ...updates } : l);
     setLayers(newLayers);
+  };
+
+  const confirmDeleteLayer = (id) => {
+    setDeleteConfirmation({ type: 'single', ids: [id] });
   };
 
   const deleteLayer = (ids) => {
@@ -1848,75 +1889,259 @@ export default function App() {
 
   const selectedLayerData = layers.find(l => l.id === selectedLayer);
 
-  const handleLayerSelect = (layerId, mode, currentSelectedLayer) => {
-    if (mode === 'single') {
-      setSelectedLayer(layerId);
-      setSelectedLayers([]);
-    } else if (mode === 'add-multi') {
-      const newSelection = [...selectedLayers];
-      if (currentSelectedLayer && !newSelection.includes(currentSelectedLayer)) {
-        newSelection.push(currentSelectedLayer);
-      }
-      newSelection.push(layerId);
-      setSelectedLayers(newSelection);
-      setSelectedLayer(null);
-    } else if (mode === 'remove-multi') {
-      setSelectedLayers(selectedLayers.filter(id => id !== layerId));
-      setSelectedLayer(null);
-    }
-  };
-
-  const handleDeleteLayer = (type, ids) => {
-    setDeleteConfirmation({ type, ids });
-  };
-
   return (
     <div className="flex h-screen bg-gray-900 text-white">
-      <LayersPanel
-        layers={layers}
-        selectedLayer={selectedLayer}
-        selectedLayers={selectedLayers}
-        draggedLayer={draggedLayer}
-        dragOverIndex={dragOverIndex}
-        cropMode={cropMode}
-        deleteConfirmation={deleteConfirmation}
-        onLayerSelect={handleLayerSelect}
-        onToggleVisibility={toggleVisibility}
-        onDeleteLayer={handleDeleteLayer}
-        onMoveLayer={moveLayer}
-        onDraggedLayerChange={setDraggedLayer}
-        onDragOverIndexChange={setDragOverIndex}
-        onDeselectAll={() => setSelectedLayer(null)}
-      />
+      <div className={`w-64 bg-gray-800 flex flex-col ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`} onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
+          setSelectedLayer(null);
+        }
+      }}>
+        <div className="p-4 overflow-y-auto flex-1">
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Nailed-it
+          </h1>
+          <p className="text-sm text-gray-400 mb-6">
+            Thumbnail Editor
+          </p>
+
+          <h2 className="text-xl font-bold mb-3">Layers</h2>
+          <div className="space-y-2">
+          {layers.length === 0 ? (
+            <div className="text-center py-8 px-4">
+              <p className="text-gray-400 text-sm mb-2">No layers yet</p>
+              <p className="text-gray-500 text-xs">Add an image or text to get started</p>
+            </div>
+          ) : (
+            <>
+              {[...layers].reverse().map((layer, idx) => {
+            const actualIndex = layers.length - 1 - idx;
+            const isDragOver = dragOverIndex === actualIndex;
+            return (
+              <div key={layer.id} className="relative">
+                {isDragOver && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-500 z-10"></div>
+                )}
+                <div
+                  draggable
+                  onDragStart={() => setDraggedLayer(actualIndex)}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOverIndex(actualIndex);
+                  }}
+                  onDragLeave={() => setDragOverIndex(null)}
+                  onDrop={() => {
+                    if (draggedLayer !== null) {
+                      moveLayer(draggedLayer, actualIndex);
+                      setDraggedLayer(null);
+                      setDragOverIndex(null);
+                    }
+                  }}
+                  className={`p-2 bg-gray-700 rounded flex items-center gap-2 cursor-move ${
+                    selectedLayer === layer.id || selectedLayers.includes(layer.id) ? 'ring-2 ring-blue-500' : ''
+                  }`}
+                  onClick={(e) => {
+                    // Ctrl is pressed: multi-select mode
+                    if (e.ctrlKey || e.metaKey) {
+                      // Toggle selection
+                      if (selectedLayers.includes(layer.id)) {
+                        setSelectedLayers(selectedLayers.filter(id => id !== layer.id));
+                      } else {
+                        // Add to selection
+                        // If there's a currently selected single layer, include it
+                        const newSelection = [...selectedLayers];
+                        if (selectedLayer && !newSelection.includes(selectedLayer)) {
+                          newSelection.push(selectedLayer);
+                        }
+                        newSelection.push(layer.id);
+                        setSelectedLayers(newSelection);
+                      }
+                      setSelectedLayer(null);
+                    } else {
+                      // Single select mode
+                      setSelectedLayer(layer.id);
+                      setSelectedLayers([]);
+                    }
+                  }}
+                >
+                  <button onClick={(e) => { e.stopPropagation(); toggleVisibility(layer.id); }}>
+                    {layer.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                  </button>
+                  <span className="flex-1 text-sm truncate">
+                    {layer.type === 'text' ? layer.text : `Image ${layer.id}`}
+                  </span>
+                  <button onClick={(e) => { 
+                    e.stopPropagation(); 
+                    // If this layer is part of a multi-selection, delete all selected layers
+                    if (selectedLayers.includes(layer.id) && selectedLayers.length > 0) {
+                      setDeleteConfirmation({ type: 'multiple', ids: selectedLayers });
+                    } else {
+                      confirmDeleteLayer(layer.id);
+                    }
+                  }}>
+                    <Trash2 size={16} className="text-red-400" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+            </>
+          )}
+          </div>
+        </div>
+        
+        <div className="p-4 border-t border-gray-700">
+          <a 
+            href="https://github.com/chavisr/nailed-it"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+            title="View on GitHub"
+          >
+            <Github size={18} />
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
 
       <div className="flex-1 flex flex-col" style={{ backgroundColor: canvasSettings.workspaceColor || '#2E3848' }}>
-        <Toolbar
-          zoom={zoom}
-          selectedLayer={selectedLayer}
-          selectedLayers={selectedLayers}
-          cropMode={cropMode}
-          deleteConfirmation={deleteConfirmation}
-          onZoomIn={() => setZoom(Math.min(3, zoom + 0.1))}
-          onZoomOut={() => setZoom(Math.max(0.1, zoom - 0.1))}
-          onResetZoom={() => setZoom(1)}
-          onExportProject={exportProject}
-          onImportProject={importProject}
-          onAddImage={addImage}
-          onAddText={addText}
-          onExportImage={exportImage}
-          onDeleteSelected={() => {
-            if (selectedLayers.length > 0) {
-              setDeleteConfirmation({ type: 'multiple', ids: selectedLayers });
-            } else if (selectedLayer) {
-              setDeleteConfirmation({ type: 'single', ids: [selectedLayer] });
-            }
-          }}
-          onApplyCrop={applyCrop}
-          onCancelCrop={cancelCrop}
-          onConfirmDelete={() => deleteLayer(deleteConfirmation.ids)}
-          onCancelDelete={cancelDelete}
-          onDeselectAll={() => setSelectedLayer(null)}
-        />
+        <div className="p-4 bg-gray-800 flex items-center gap-4 border-b border-gray-700" onMouseDown={(e) => {
+          if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
+            setSelectedLayer(null);
+          }
+        }}>
+          <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
+            <button
+              onClick={exportProject}
+              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded text-sm"
+              title="Save Project"
+            >
+              <Download size={16} />
+              <span className="text-xs">Save</span>
+            </button>
+            <label className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded cursor-pointer text-sm"
+              title="Load Project">
+              <ImagePlus size={16} />
+              <span className="text-xs">Load</span>
+              <input type="file" accept=".json" onChange={importProject} className="hidden" />
+            </label>
+          </div>
+
+          <div className="h-6 w-px bg-gray-600"></div>
+
+          <div className={`flex items-center gap-2 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
+            <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded cursor-pointer text-sm"
+              title="Add Image">
+              <ImagePlus size={18} />
+              <input type="file" accept="image/*" onChange={addImage} className="hidden" />
+            </label>
+            <button
+              onClick={addText}
+              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm"
+              title="Add Text"
+            >
+              <Type size={18} />
+            </button>
+            <button
+              onClick={exportImage}
+              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm"
+              title="Download PNG"
+            >
+              <Download size={18} />
+            </button>
+          </div>
+
+          {(selectedLayer || selectedLayers.length > 0) && !cropMode && !deleteConfirmation && (
+            <>
+              <div className="h-6 w-px bg-gray-600"></div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (selectedLayers.length > 0) {
+                      setDeleteConfirmation({ type: 'multiple', ids: selectedLayers });
+                    } else if (selectedLayer) {
+                      setDeleteConfirmation({ type: 'single', ids: [selectedLayer] });
+                    }
+                  }}
+                  className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-2 rounded text-sm"
+                  title="Delete Selected Layer(s)"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </>
+          )}
+
+          <div className="h-6 w-px bg-gray-600"></div>
+
+          <div className={`flex items-center gap-4 flex-1 ${cropMode || deleteConfirmation ? 'pointer-events-none opacity-50' : ''}`}>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}
+                className="p-2 bg-gray-700 hover:bg-gray-600 rounded"
+                title="Zoom Out"
+              >
+                <ZoomOut size={18} />
+              </button>
+              <span className="text-sm w-16 text-center">{(zoom * 100).toFixed(0)}%</span>
+              <button
+                onClick={() => setZoom(Math.min(3, zoom + 0.1))}
+                className="p-2 bg-gray-700 hover:bg-gray-600 rounded"
+                title="Zoom In"
+              >
+                <ZoomIn size={18} />
+              </button>
+              <button
+                onClick={() => setZoom(1)}
+                className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+                title="Reset Zoom"
+              >
+                Reset Zoom
+              </button>
+            </div>
+          </div>
+          
+          {cropMode && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-400 mr-2">Hold <strong>Shift</strong> to maintain ratio</span>
+              <button
+                onClick={applyCrop}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-medium"
+              >
+                <Check size={18} />
+                Apply Crop
+              </button>
+              <button
+                onClick={cancelCrop}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+              >
+                <X size={18} />
+                Cancel
+              </button>
+            </div>
+          )}
+          
+          {deleteConfirmation && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-400 mr-2">
+                Delete {deleteConfirmation.ids.length} layer{deleteConfirmation.ids.length > 1 ? 's' : ''}?
+              </span>
+              <button
+                onClick={() => deleteLayer(deleteConfirmation.ids)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+              >
+                <Check size={18} />
+                Confirm Delete
+              </button>
+              <button
+                onClick={cancelDelete}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-sm font-medium"
+              >
+                <X size={18} />
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className="flex-1 flex items-center justify-center p-8 overflow-auto" onMouseDown={(e) => {
           if (e.target === e.currentTarget && !cropMode && !deleteConfirmation) {
