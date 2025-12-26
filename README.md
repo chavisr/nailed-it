@@ -69,14 +69,39 @@ npm run dev
 ## 🏗️ Project Structure
 
 ```
-nailed-it-editor/
+nailed-it/
 ├── src/
-│   └── App.jsx  # Main component
+│   ├── components/
+│   │   ├── CanvasSettingsPanel.jsx  # Canvas configuration panel
+│   │   ├── LayersPanel.jsx          # Layer list with drag-drop
+│   │   ├── PropertiesPanel.jsx      # Layer property editor
+│   │   └── Toolbar.jsx              # Main toolbar controls
+│   ├── constants/
+│   │   └── index.js                 # App constants (DEFAULT_CANVAS, IMAGE_FILTERS)
+│   ├── hooks/
+│   │   └── useLocalStorage.js       # LocalStorage persistence hook
+│   ├── utils/
+│   │   ├── filters.js               # Image adjustment utilities
+│   │   ├── fonts.js                 # Google Fonts loader
+│   │   └── storage.js               # LocalStorage operations
+│   ├── App.jsx                      # Main application component
+│   ├── index.css                    # Global styles with Tailwind
+│   └── main.jsx                     # React entry point
 ├── public/
 ├── package.json
 ├── vite.config.js
+├── tailwind.config.js
 └── README.md
 ```
+
+## 🛠️ Tech Stack
+
+- **React 19** - UI framework
+- **Vite** - Build tool and dev server
+- **Tailwind CSS** - Utility-first styling
+- **Lucide React** - Icon library
+- **Canvas API** - Image rendering and manipulation
+- **LocalStorage** - Auto-save and project persistence
 
 ## 📄 License
 
