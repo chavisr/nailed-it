@@ -66,10 +66,12 @@ export default function App() {
     } catch (error) {
       console.error('Failed to load saved state:', error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     renderCanvas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layers, canvasSettings, selectedLayer, selectedLayers, guides, cropMode, cropBox]);
 
   // Save to localStorage whenever layers or canvas settings change
@@ -321,6 +323,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLayer, selectedLayers, layers, cropMode, deleteConfirmation]);
 
   const applyImageAdjustments = (ctx, layer) => {
